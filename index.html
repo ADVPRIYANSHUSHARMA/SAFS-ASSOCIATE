@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAFS ASSOCIATE · Accounting Suite</title>
+    <!-- html2pdf for PDF export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- SheetJS for Excel export/import -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+        }
+        body {
+            background: #eef2f6;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .app-container {
+            max-width: 1300px;
+            width: 100%;
+            background: white;
+            border-radius: 28px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            padding: 28px 32px;
+        }
+        /* Header with website name */
+        .brand-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+            padding-bottom: 12px;
+            border-bottom: 3px solid #0f172a;
+        }
+        .brand-header h1 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: #0f172a;
+        }
+        .brand-header h1 span {
+            color: #2563eb;
+        }
+        .brand-header .badge {
+            background: #0f172a;
+            color: white;
+            font-size: 0.8rem;
+            padding: 6px 16px;
+            border-radius: 30px;
+            letter-spacing: 0.5px;
+        }
+
+        /* Company tab */
+        .company-tab {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: #f8fafc;
+            padding: 12px 22px;
+            border-radius: 40px;
+            margin-bottom: 22px;
+            border: 1px solid #cbd5e1;
+            width: fit-content;
+        }
+        .company-tab label {
+            font-weight: 600;
+            color: #0f172a;
+            font-size: 1rem;
+        }
+        .company-tab input {
+            border: 1px solid #cbd5e1;
+            border-radius: 30px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            width: 380px;
+            background: white;
+            outline: none;
+            transition: 0.2s;
+        }
+        .company-tab input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.2);
+        }
+
+        /* Toolbar */
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 26px;
+            align-items: center;
+        }
+        button, .file-label {
+            background: white;
+            border: 1px solid #cbd5e1;
+            border-radius: 30px;
+            padding: 10px 24px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+            color: #1e293b;
+        }
+        button:hover, .file-label:hover {
+            background: #f1f5f9;
+            border-color: #94a3b8;
+        }
+        .btn-primary {
+            background: #2563eb;
+            border-color: #2563eb;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+        .btn-success {
+            background: #16a34a;
+            border-color: #16a34a;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #15803d;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #94a3b8;
+        }
+        input[type="file"] {
+            display: none;
+        }
+
+        /* Forms stacked one by one */
+        .forms-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
+        .card {
+            background: white;
+            border-radius: 18px;
+            border: 1px solid #cbd5e1;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.02);
+            overflow: hidden;
+        }
+        .card-header {
+            background: #f1f5f9;
+            padding: 14px 22px;
+            font-weight: 700;
+            font-size: 1.25rem;
+            border-bottom: 1px solid #cbd5e1;
+            color: #0f172a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .card-header .sub {
+            font-size: 0.8rem;
+            font-weight: 400;
+            color: #475569;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.92rem;
+        }
+        th {
+            background: #e9eef3;
+            font-weight: 600;
+            padding: 12px 14px;
+            text-align: left;
+            border: 1px solid #b0bcc9;
+            color: #0f172a;
+        }
+        td {
+            padding: 8px 12px;
+            border: 1px solid #b0bcc9;
+            vertical-align: middle;
+        }
+        input.cell-input {
+            width: 100%;
+            border: none;
+            background: transparent;
+            padding: 6px 4px;
+            font-size: 0.92rem;
+            outline: none;
+            font-family: inherit;
+            transition: 0.1s;
+        }
+        input.cell-input:focus {
+            background: #eff6ff;
+            border-radius: 6px;
+            box-shadow: 0 0 0 2px #bfdbfe;
+        }
+        input.amount-input {
+            text-align: right;
+            font-family: 'Courier New', monospace;
+            font-weight: 500;
+        }
+        .two-col-format {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+        }
+        .two-col-format > div {
+            border-right: 1px solid #b0bcc9;
+        }
+        .two-col-format > div:last-child {
+            border-right: none;
+        }
+        .table-header-merged {
+            background: #dde4ec;
+            font-weight: 700;
+            text-align: center;
+            padding: 10px;
+            border: 1px solid #b0bcc9;
+            letter-spacing: 0.3px;
+        }
+        .signature-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 16px 22px;
+            border-top: 1px dashed #94a3b8;
+            font-size: 0.9rem;
+            color: #334155;
+            margin-top: 6px;
+            background: #fafcff;
+        }
+        .signature-row .date-place {
+            font-weight: 500;
+            color: #0f172a;
+        }
+        .signature-row .date-place span {
+            font-weight: 600;
+            border-bottom: 1px solid #94a3b8;
+            padding: 0 10px;
+            margin-left: 6px;
+        }
+        .footer {
+            margin-top: 36px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #475569;
+            border-top: 2px solid #e2e8f0;
+            padding-top: 22px;
+            letter-spacing: 0.3px;
+        }
+        .footer strong {
+            color: #0f172a;
+        }
+
+        /* Print/PDF styles */
+        @media print {
+            body { background: white; padding: 0; }
+            .app-container { box-shadow: none; padding: 0; border-radius: 0; }
+            .toolbar, .company-tab, .brand-header .badge { display: none !important; }
+            .card { break-inside: avoid; border: 2px solid #222; box-shadow: none; }
+            th, td { border: 1px solid #222 !important; }
+            .signature-row { border-top: 1px solid #222; }
+            .footer { border-top: 2px solid #222; }
+            .forms-wrapper { gap: 20px; }
+        }
+        @media (max-width: 900px) {
+            .company-tab input { width: 240px; }
+            .two-col-format { grid-template-columns: 1fr; }
+            .two-col-format > div { border-right: none; border-bottom: 1px solid #b0bcc9; }
+        }
+        /* Hide elements in PDF export */
+        .skip-in-pdf {
+            /* used only for toolbar and company tab, already hidden in print */
+        }
+        .pdf-hide {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+<div class="app-container" id="accountingApp">
+    <!-- Brand Header (website name) -->
+    <div class="brand-header">
+        <h1><span>SAFS</span> ASSOCIATE</h1>
+        <div class="badge">ACCOUNTING SUITE</div>
+    </div>
+
+    <!-- Company name tab -->
+    <div class="company-tab">
+        <label>🏢 Company Name:</label>
+        <input type="text" id="companyNameInput" placeholder="Enter company name" value="My Company">
+    </div>
+
+    <!-- Import/Export toolbar (hidden in PDF) -->
+    <div class="toolbar">
+        <button class="btn-primary" id="exportPdfBtn">📄 Export to PDF</button>
+        <button class="btn-success" id="exportExcelBtn">📊 Export to Excel</button>
+        <button class="btn-outline" id="exportWordBtn">📝 Export to Word</button>
+        <label class="file-label" for="importFile">📂 Import (JPG, PNG, PDF, WORD, XLSX, CSV, JSON)</label>
+        <input type="file" id="importFile" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.csv,.json,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv,application/json">
+    </div>
+
+    <!-- ALL FORMS ONE BY ONE -->
+    <div class="forms-wrapper">
+        <!-- 1. TRIAL BALANCE -->
+        <div class="card" id="trialBalanceCard">
+            <div class="card-header">
+                <span>⚖️ Trial Balance</span>
+                <span class="sub">as on date</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:45%">Particulars</th>
+                        <th style="width:27.5%">Amount (Dr)</th>
+                        <th style="width:27.5%">Amount (Cr)</th>
+                    </tr>
+                </thead>
+                <tbody id="trialBody"></tbody>
+            </table>
+            <div style="padding: 12px 20px;">
+                <button class="btn-outline" style="padding:6px 18px; font-size:0.85rem;" id="addTrialRowBtn">+ Add Row</button>
+            </div>
+            <div class="signature-row">
+                <div>Prepared by: ___________</div>
+                <div class="date-place">Date: <span>___________</span> &nbsp; Place: <span>___________</span></div>
+            </div>
+        </div>
+
+        <!-- 2. PROFIT & LOSS ACCOUNT -->
+        <div class="card" id="plCard">
+            <div class="card-header">
+                <span>📈 Profit & Loss Account</span>
+                <span class="sub">for the period ending</span>
+            </div>
+            <div class="two-col-format">
+                <div>
+                    <div class="table-header-merged">Expenditure</div>
+                    <table>
+                        <thead><tr><th style="width:70%">Particulars</th><th style="width:30%">Amount</th></tr></thead>
+                        <tbody id="plExpBody"></tbody>
+                    </table>
+                </div>
+                <div>
+                    <div class="table-header-merged">Income</div>
+                    <table>
+                        <thead><tr><th style="width:70%">Particulars</th><th style="width:30%">Amount</th></tr></thead>
+                        <tbody id="plIncBody"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div style="padding: 12px 20px; display: flex; gap: 12px;">
+                <button class="btn-outline" style="padding:6px 18px; font-size:0.85rem;" id="addPlExpBtn">+ Add Expenditure</button>
+                <button class="btn-outline" style="padding:6px 18px; font-size:0.85rem;" id="addPlIncBtn">+ Add Income</button>
+            </div>
+            <div class="signature-row">
+                <div>Accountant: ___________</div>
+                <div class="date-place">Date: <span>___________</span> &nbsp; Place: <span>___________</span></div>
+            </div>
+        </div>
+
+        <!-- 3. CAPITAL ACCOUNT -->
+        <div class="card" id="capitalAccountCard">
+            <div class="card-header">
+                <span>💰 Capital Account</span>
+                <span class="sub">Expenditure | Income</span>
+            </div>
+            <div class="two-col-format">
+                <div>
+                    <div class="table-header-merged">Expenditure</div>
+                    <table>
+                        <thead><tr><th style="width:70%">Particulars</th><th style="width:30%">Amount</th></tr></thead>
+                        <tbody id="capitalExpBody"></tbody>
+                    </table>
+                </div>
+                <div>
+                    <div class="table-header-merged">Income</div>
+                    <table>
+                        <thead><tr><th style="width:70%">Particulars</th><th style="width:30%">Amount</th></tr></thead>
+                        <tbody id="capitalIncBody"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div style="padding: 12px 20px; display: flex; gap: 12px;">
+                <button class="btn-outline" style="padding:6px 18px; font-size:0.85rem;" id="addCapitalExpBtn">+ Add Expenditure</button>
+                <button class="btn-outline" style="padding:6px 18px; font-size:0.85rem;" id="addCapitalIncBtn">+ Add Income</button>
+            </div>
+            <div class="signature-row">
+                <div>Partner/Proprietor: ___________</div>
+                <div class="date-place">Date: <span>___________</span> &nbsp; Place: <span>___________</span></div>
+            </div>
+        </div>
+
+        <!-- 4. BALANCE SHEET -->
+        <div class="card" id="balanceSheetCard">
+            <div class="card-header">
+                <span>🏦 Balance Sheet</span>
+                <span class="sub">as at end of period</span>
+            </div>
+            <div class="two-col-format">
+                <div>
+                    <div class="table-header-merged">Liabilities</div>
+                    <table>
+                        <thead><tr><th style="width:70%">Particulars</th><th style="width:30%">Amount</th></tr></thead>
+                        <tbody id="bsLiabBody"></tbody>
+                    </table>
+                </div>
+                <div>
+                    <div class="table-header-merged">Assets</div>
+                    <table>
+                        <thead><tr><th style="width:70%">Particulars</th><th style="width:30%">Amount</th></tr></thead>
+                        <tbody id="bsAssetBody"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div style="padding: 12px 20px; display: flex; gap: 12px;">
+                <button class="btn-outline" style="padding:6px 18px; font-size:0.85rem;" id="addBsLiabBtn">+ Add Liability</button>
+                <button class="btn-outline" style="padding:6px 18px; font-size:0.85rem;" id="addBsAssetBtn">+ Add Asset</button>
+            </div>
+            <div class="signature-row">
+                <div>Director/Proprietor: ___________</div>
+                <div class="date-place">Date: <span>___________</span> &nbsp; Place: <span>___________</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER: Copyright 2026 SAFS ASSOCIATE -->
+    <div class="footer">
+        <strong>© 2026 SAFS ASSOCIATE</strong> — All rights reserved.
+    </div>
+</div>
+
+<script>
+    (function(){
+        // ---------- DOM refs ----------
+        const companyNameInput = document.getElementById('companyNameInput');
+        const trialBody = document.getElementById('trialBody');
+        const plExpBody = document.getElementById('plExpBody');
+        const plIncBody = document.getElementById('plIncBody');
+        const capitalExpBody = document.getElementById('capitalExpBody');
+        const capitalIncBody = document.getElementById('capitalIncBody');
+        const bsLiabBody = document.getElementById('bsLiabBody');
+        const bsAssetBody = document.getElementById('bsAssetBody');
+
+        // ---------- Row creators ----------
+        function createTrialRow(particular = '', dr = '', cr = '') {
+            const tr = document.createElement('tr');
+            const td1 = document.createElement('td');
+            const input1 = document.createElement('input');
+            input1.type = 'text'; input1.className = 'cell-input'; input1.placeholder = 'Particulars';
+            input1.value = particular;
+            td1.appendChild(input1);
+            const td2 = document.createElement('td');
+            const inputDr = document.createElement('input');
+            inputDr.type = 'text'; inputDr.className = 'cell-input amount-input'; inputDr.placeholder = 'Dr';
+            inputDr.value = dr;
+            td2.appendChild(inputDr);
+            const td3 = document.createElement('td');
+            const inputCr = document.createElement('input');
+            inputCr.type = 'text'; inputCr.className = 'cell-input amount-input'; inputCr.placeholder = 'Cr';
+            inputCr.value = cr;
+            td3.appendChild(inputCr);
+            tr.appendChild(td1); tr.appendChild(td2); tr.appendChild(td3);
+            return tr;
+        }
+
+        function createSimpleRow(particular = '', amount = '') {
+            const tr = document.createElement('tr');
+            const td1 = document.createElement('td');
+            const input1 = document.createElement('input');
+            input1.type = 'text'; input1.className = 'cell-input'; input1.placeholder = 'Particulars';
+            input1.value = particular;
+            td1.appendChild(input1);
+            const td2 = document.createElement('td');
+            const input2 = document.createElement('input');
+            input2.type = 'text'; input2.className = 'cell-input amount-input'; input2.placeholder = '0.00';
+            input2.value = amount;
+            td2.appendChild(input2);
+            tr.appendChild(td1); tr.appendChild(td2);
+            return tr;
+        }
+
+        // ---------- Populate initial demo data ----------
+        function populateDemo() {
+            // Trial Balance
+            trialBody.innerHTML = '';
+            trialBody.appendChild(createTrialRow('Cash', '25,000', ''));
+            trialBody.appendChild(createTrialRow('Bank', '80,000', ''));
+            trialBody.appendChild(createTrialRow('Capital', '', '1,00,000'));
+            trialBody.appendChild(createTrialRow('Sales', '', '40,000'));
+            trialBody.appendChild(createTrialRow('Purchases', '35,000', ''));
+
+            // P&L
+            plExpBody.innerHTML = '';
+            plExpBody.appendChild(createSimpleRow('Purchases', '35,000'));
+            plExpBody.appendChild(createSimpleRow('Rent', '8,000'));
+            plExpBody.appendChild(createSimpleRow('Salaries', '12,000'));
+            plIncBody.innerHTML = '';
+            plIncBody.appendChild(createSimpleRow('Sales', '40,000'));
+            plIncBody.appendChild(createSimpleRow('Interest Received', '2,000'));
+
+            // Capital Account
+            capitalExpBody.innerHTML = '';
+            capitalExpBody.appendChild(createSimpleRow('Drawings', '10,000'));
+            capitalExpBody.appendChild(createSimpleRow('Income Tax', '5,000'));
+            capitalIncBody.innerHTML = '';
+            capitalIncBody.appendChild(createSimpleRow('Opening Balance', '80,000'));
+            capitalIncBody.appendChild(createSimpleRow('Net Profit', '30,000'));
+
+            // Balance Sheet
+            bsLiabBody.innerHTML = '';
+            bsLiabBody.appendChild(createSimpleRow('Capital', '1,00,000'));
+            bsLiabBody.appendChild(createSimpleRow('Loans', '50,000'));
+            bsAssetBody.innerHTML = '';
+            bsAssetBody.appendChild(createSimpleRow('Cash', '25,000'));
+            bsAssetBody.appendChild(createSimpleRow('Bank', '80,000'));
+            bsAssetBody.appendChild(createSimpleRow('Furniture', '30,000'));
+        }
+        populateDemo();
+
+        // ---------- Add row handlers ----------
+        document.getElementById('addTrialRowBtn').addEventListener('click', () => trialBody.appendChild(createTrialRow('', '', '')));
+        document.getElementById('addPlExpBtn').addEventListener('click', () => plExpBody.appendChild(createSimpleRow('', '')));
+        document.getElementById('addPlIncBtn').addEventListener('click', () => plIncBody.appendChild(createSimpleRow('', '')));
+        document.getElementById('addCapitalExpBtn').addEventListener('click', () => capitalExpBody.appendChild(createSimpleRow('', '')));
+        document.getElementById('addCapitalIncBtn').addEventListener('click', () => capitalIncBody.appendChild(createSimpleRow('', '')));
+        document.getElementById('addBsLiabBtn').addEventListener('click', () => bsLiabBody.appendChild(createSimpleRow('', '')));
+        document.getElementById('addBsAssetBtn').addEventListener('click', () => bsAssetBody.appendChild(createSimpleRow('', '')));
+
+        // ---------- EXPORT PDF (with company name and footer) ----------
+        document.getElementById('exportPdfBtn').addEventListener('click', function() {
+            const element = document.getElementById('accountingApp');
+            const companyName = companyNameInput.value.trim() || 'Company';
+            // Clone to modify without affecting page
+            const clone = element.cloneNode(true);
+            // Hide toolbar and company tab in clone
+            const toolbar = clone.querySelector('.toolbar');
+            if (toolbar) toolbar.remove();
+            const companyTab = clone.querySelector('.company-tab');
+            if (companyTab) companyTab.remove();
+            // Ensure footer stays
+            // Set company name inside a header for PDF? We'll add a title at top
+            const brandHeader = clone.querySelector('.brand-header');
+            if (brandHeader) {
+                // keep brand header
+            }
+            // Add company name in PDF as a subtitle (if not already present)
+            const existingCompany = clone.querySelector('.pdf-company-name');
+            if (!existingCompany) {
+                const companyDiv = document.createElement('div');
+                companyDiv.className = 'pdf-company-name';
+                companyDiv.style.padding = '10px 0 0 0';
+                companyDiv.style.fontSize = '1.4rem';
+                companyDiv.style.fontWeight = '700';
+                companyDiv.style.color = '#0f172a';
+                companyDiv.style.textAlign = 'center';
+                companyDiv.textContent = companyName;
+                // insert after brand header
+                const brand = clone.querySelector('.brand-header');
+                if (brand && brand.parentNode) {
+                    brand.parentNode.insertBefore(companyDiv, brand.nextSibling);
+                } else {
+                    clone.prepend(companyDiv);
+                }
+            }
+            // Make sure footer remains
+            const footer = clone.querySelector('.footer');
+            if (footer) {
+                footer.innerHTML = '<strong>© 2026 SAFS ASSOCIATE</strong> — All rights reserved.';
+            }
+            // Options for html2pdf
+            const opt = {
+                margin: [0.5, 0.5, 0.5, 0.5],
+                filename: `${companyName.replace(/\s+/g, '_')}_Accounting_Report.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, letterRendering: true, useCORS: true, logging: false },
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(clone).save();
+        });
+
+        // ---------- EXPORT EXCEL (XLSX) ----------
+        document.getElementById('exportExcelBtn').addEventListener('click', function() {
+            const wb = XLSX.utils.book_new();
+            // Trial Balance
+            const trialData = [['Particulars', 'Dr Amount', 'Cr Amount']];
+            trialBody.querySelectorAll('tr').forEach(tr => {
+                const inputs = tr.querySelectorAll('input');
+                if (inputs.length === 3) trialData.push([inputs[0].value, inputs[1].value, inputs[2].value]);
+            });
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(trialData), 'Trial Balance');
+
+            // P&L Expenditure
+            const plExpData = [['Expenditure', 'Amount']];
+            plExpBody.querySelectorAll('tr').forEach(tr => {
+                const inputs = tr.querySelectorAll('input');
+                if (inputs.length === 2) plExpData.push([inputs[0].value, inputs[1].value]);
+            });
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(plExpData), 'P&L Expenditure');
+
+            const plIncData = [['Income', 'Amount']];
+            plIncBody.querySelectorAll('tr').forEach(tr => {
+                const inputs = tr.querySelectorAll('input');
+                if (inputs.length === 2) plIncData.push([inputs[0].value, inputs[1].value]);
+            });
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(plIncData), 'P&L Income');
+
+            // Capital
+            const capExpData = [['Expenditure', 'Amount']];
+            capitalExpBody.querySelectorAll('tr').forEach(tr => {
+                const inputs = tr.querySelectorAll('input');
+                if (inputs.length === 2) capExpData.push([inputs[0].value, inputs[1].value]);
+            });
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(capExpData), 'Capital Expenditure');
+
+            const capIncData = [['Income', 'Amount']];
+            capitalIncBody.querySelectorAll('tr').forEach(tr => {
+                const inputs = tr.querySelectorAll('input');
+                if (inputs.length === 2) capIncData.push([inputs[0].value, inputs[1].value]);
+            });
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(capIncData), 'Capital Income');
+
+            // Balance Sheet
+            const bsLiabData = [['Liabilities', 'Amount']];
+            bsLiabBody.querySelectorAll('tr').forEach(tr => {
+                const inputs = tr.querySelectorAll('input');
+                if (inputs.length === 2) bsLiabData.push([inputs[0].value, inputs[1].value]);
+            });
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(bsLiabData), 'BS Liabilities');
+
+            const bsAssetData = [['Assets', 'Amount']];
+            bsAssetBody.querySelectorAll('tr').forEach(tr => {
+                const inputs = tr.querySelectorAll('input');
+                if (inputs.length === 2) bsAssetData.push([inputs[0].value, inputs[1].value]);
+            });
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(bsAssetData), 'BS Assets');
+
+            const companyName = companyNameInput.value.trim() || 'Company';
+            XLSX.writeFile(wb, `${companyName.replace(/\s+/g, '_')}_Accounting.xlsx`);
+        });
+
+        // ---------- EXPORT WORD (HTML) ----------
+        document.getElementById('exportWordBtn').addEventListener('click', function() {
+            const companyName = companyNameInput.value.trim() || 'Company';
+            const content = document.getElementById('accountingApp').cloneNode(true);
+            // Remove toolbar and company tab
+            const toolbar = content.querySelector('.toolbar');
+            if (toolbar) toolbar.remove();
+            const companyTab = content.querySelector('.company-tab');
+            if (companyTab) companyTab.remove();
+            // Remove all buttons inside
+            content.querySelectorAll('button').forEach(btn => btn.remove());
+            // Company name header
+            const companyHeader = document.createElement('h2');
+            companyHeader.textContent = companyName;
+            companyHeader.style.textAlign = 'center';
+            companyHeader.style.margin = '20px 0';
+            companyHeader.style.fontSize = '1.6rem';
+            const brand = content.querySelector('.brand-header');
+            if (brand && brand.parentNode) {
+                brand.parentNode.insertBefore(companyHeader, brand.nextSibling);
+            } else {
+                content.prepend(companyHeader);
+            }
+            // Build full HTML
+            const htmlContent = `
+                <html>
+                <head><meta charset="UTF-8"><title>${companyName} - Accounting Report</title>
+                <style>
+                    body { font-family: 'Segoe UI', Arial, sans-serif; padding: 30px; }
+                    table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+                    th, td { border: 1px solid #333; padding: 8px; }
+                    .card { border: 1px solid #999; margin-bottom: 30px; padding: 10px; }
+                    .card-header { font-weight: bold; font-size: 1.2em; margin-bottom: 8px; }
+                    .table-header-merged { background: #e0e0e0; font-weight: bold; text-align: center; padding: 8px; }
+                    .footer { text-align: center; margin-top: 40px; font-size: 0.9em; border-top: 1px solid #ccc; padding-top: 15px; }
+                    .signature-row { display: flex; justify-content: space-between; margin-top: 10px; font-size: 0.9em; }
+                </style>
+                </head>
+                <body>
+                    ${content.innerHTML}
+                    <div class="footer"><strong>© 2026 SAFS ASSOCIATE</strong> — All rights reserved.</div>
+                </body>
+                </html>
+            `;
+            const blob = new Blob([htmlContent], { type: 'application/msword' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${companyName.replace(/\s+/g, '_')}_Accounting.doc`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+
+        // ---------- IMPORT (JSON full, CSV/XLSX basic) ----------
+        document.getElementById('importFile').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const fileName = file.name.toLowerCase();
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                try {
+                    if (fileName.endsWith('.json')) {
+                        const data = JSON.parse(e.target.result);
+                        if (data.companyName) companyNameInput.value = data.companyName;
+                        function repopulate(body, rows, isTrial = false) {
+                            if (!Array.isArray(rows)) return;
+                            body.innerHTML = '';
+                            rows.forEach(row => {
+                                if (isTrial) {
+                                    body.appendChild(createTrialRow(row.particulars || '', row.dr || '', row.cr || ''));
+                                } else {
+                                    body.appendChild(createSimpleRow(row.particulars || '', row.amount || ''));
+                                }
+                            });
+                        }
+                        if (data.trialBalance) repopulate(trialBody, data.trialBalance, true);
+                        if (data.plExpenditure) repopulate(plExpBody, data.plExpenditure);
+                        if (data.plIncome) repopulate(plIncBody, data.plIncome);
+                        if (data.capitalExpenditure) repopulate(capitalExpBody, data.capitalExpenditure);
+                        if (data.capitalIncome) repopulate(capitalIncBody, data.capitalIncome);
+                        if (data.bsLiabilities) repopulate(bsLiabBody, data.bsLiabilities);
+                        if (data.bsAssets) repopulate(bsAssetBody, data.bsAssets);
+                        alert('JSON data imported successfully.');
+                    } else if (fileName.endsWith('.csv')) {
+                        const text = e.target.result;
+                        const rows = text.split('\n').map(row => row.split(','));
+                        if (rows.length > 0 && rows[0].length === 3) {
+                            trialBody.innerHTML = '';
+                            rows.forEach((row, idx) => {
+                                if (idx === 0) return;
+                                trialBody.appendChild(createTrialRow(row[0] || '', row[1] || '', row[2] || ''));
+                            });
+                            alert('CSV imported into Trial Balance (3 columns detected).');
+                        } else {
+                            alert('CSV format not recognized for full import. Use JSON for complete data.');
+                        }
+                    } else if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) {
+                        const workbook = XLSX.read(e.target.result, { type: 'array' });
+                        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                        const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+                        if (jsonData.length > 0 && jsonData[0].length === 3) {
+                            trialBody.innerHTML = '';
+                            jsonData.forEach((row, idx) => {
+                                if (idx === 0) return;
+                                trialBody.appendChild(createTrialRow(row[0] || '', row[1] || '', row[2] || ''));
+                            });
+                            alert('
