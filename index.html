@@ -1,538 +1,472 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAFS ASSOCIATE · CA Accounting Suite</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, system-ui, sans-serif; }
-        body { background: #eef2f6; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-        .app-container { max-width: 1400px; width: 100%; background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.08); padding: 24px 30px; }
-
-        /* Brand */
-        .brand-header { display: flex; align-items: center; justify-content: space-between; padding-bottom: 14px; border-bottom: 3px solid #0f172a; margin-bottom: 18px; }
-        .brand-header h1 { font-size: 1.9rem; font-weight: 700; letter-spacing: -0.5px; color: #0f172a; }
-        .brand-header h1 span { color: #2563eb; }
-        .badge { background: #0f172a; color: white; font-size: 0.75rem; padding: 6px 16px; border-radius: 30px; letter-spacing: 0.5px; }
-
-        /* Company tab */
-        .company-tab { display: flex; align-items: center; gap: 14px; background: #f8fafc; padding: 12px 22px; border-radius: 40px; margin-bottom: 18px; border: 1px solid #cbd5e1; width: fit-content; }
-        .company-tab label { font-weight: 600; color: #0f172a; font-size: 0.95rem; }
-        .company-tab input { border: 1px solid #cbd5e1; border-radius: 30px; padding: 9px 20px; font-size: 0.95rem; width: 360px; background: white; outline: none; }
-        .company-tab input:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.15); }
-
-        /* Toolbar */
-        .toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 22px; align-items: center; }
-        button, .file-label { background: white; border: 1px solid #cbd5e1; border-radius: 30px; padding: 9px 22px; font-weight: 500; font-size: 0.9rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s; color: #1e293b; }
-        button:hover, .file-label:hover { background: #f1f5f9; border-color: #94a3b8; }
-        .btn-primary { background: #2563eb; border-color: #2563eb; color: white; }
-        .btn-primary:hover { background: #1d4ed8; }
-        .btn-success { background: #16a34a; border-color: #16a34a; color: white; }
-        .btn-success:hover { background: #15803d; }
-        .btn-outline { background: transparent; border: 1px solid #94a3b8; }
-        input[type="file"] { display: none; }
-
-        /* Cards */
-        .forms-wrapper { display: flex; flex-direction: column; gap: 26px; }
-        .card { background: white; border-radius: 16px; border: 1px solid #cbd5e1; box-shadow: 0 4px 12px rgba(0,0,0,0.02); overflow: hidden; }
-        .card-header { background: linear-gradient(135deg, #f8fafc, #eef2f6); padding: 14px 22px; font-weight: 700; font-size: 1.15rem; border-bottom: 1px solid #cbd5e1; color: #0f172a; display: flex; justify-content: space-between; align-items: center; }
-        .card-header .sub { font-size: 0.75rem; font-weight: 400; color: #475569; }
-
-        /* Tables */
-        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-        th { background: #e9eef3; font-weight: 600; padding: 10px 12px; text-align: left; border: 1px solid #b0bcc9; color: #0f172a; font-size: 0.85rem; }
-        td { padding: 6px 10px; border: 1px solid #b0bcc9; vertical-align: middle; }
-        input.cell-input, select.cell-select { width: 100%; border: none; background: transparent; padding: 7px 4px; font-size: 0.9rem; outline: none; font-family: inherit; }
-        input.cell-input:focus, select.cell-select:focus { background: #eff6ff; border-radius: 6px; box-shadow: 0 0 0 2px #bfdbfe; }
-        select.cell-select { cursor: pointer; font-weight: 500; color: #0f172a; }
-        input.amount-input { text-align: right; font-family: 'Courier New', monospace; font-weight: 600; color: #0f172a; }
-        .two-col-format { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
-        .two-col-format > div { border-right: 1px solid #b0bcc9; }
-        .two-col-format > div:last-child { border-right: none; }
-        .table-header-merged { background: #dde4ec; font-weight: 700; text-align: center; padding: 10px; border: 1px solid #b0bcc9; letter-spacing: 0.3px; font-size: 0.9rem; }
-
-        /* Signature */
-        .signature-row { display: flex; justify-content: space-between; padding: 14px 22px; border-top: 1px dashed #94a3b8; font-size: 0.85rem; color: #334155; background: #fafcff; flex-wrap: wrap; gap: 8px; }
-        .signature-row .date-place span { font-weight: 600; border-bottom: 1px solid #94a3b8; padding: 0 12px; margin-left: 4px; }
-
-        /* Add row buttons */
-        .row-actions { padding: 10px 20px; display: flex; gap: 10px; flex-wrap: wrap; }
-        .row-actions button { padding: 6px 16px; font-size: 0.82rem; }
-
-        /* Footer */
-        .footer { margin-top: 32px; text-align: center; font-size: 0.85rem; color: #475569; border-top: 2px solid #e2e8f0; padding-top: 20px; }
-        .footer strong { color: #0f172a; }
-
-        /* Row hover */
-        tbody tr:hover { background: #fafcff; }
-        tbody tr:hover input, tbody tr:hover select { background: transparent; }
-
-        /* Print */
-        @media print {
-            body { background: white; padding: 0; }
-            .app-container { box-shadow: none; padding: 0; }
-            .toolbar, .company-tab, .badge, .row-actions { display: none !important; }
-            .card { break-inside: avoid; border: 1.5px solid #222; }
-            th, td { border: 1px solid #222 !important; }
-            .signature-row { border-top: 1px solid #222; }
-            .footer { border-top: 2px solid #222; }
-            select { -webkit-appearance: none; appearance: none; }
-        }
-
-        @media (max-width: 900px) {
-            .company-tab input { width: 220px; }
-            .two-col-format { grid-template-columns: 1fr; }
-            .two-col-format > div { border-right: none; border-bottom: 1px solid #b0bcc9; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAFS Professional Accounting Suite</title>
+<style>
+:root{--navy:#101c36;--blue:#2563eb;--bg:#f3f6fb;--line:#dce3ee}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);font-family:Segoe UI,Arial;color:#172033}
+.app{display:grid;grid-template-columns:230px 1fr;min-height:100vh}
+.sidebar{background:#101c36;color:white;padding:20px}
+.brand{font-size:22px;font-weight:bold;margin-bottom:25px}
+.brand span{color:#60a5fa}
+.nav button{display:block;width:100%;text-align:left;padding:12px;margin:4px 0;background:transparent;color:#dbeafe;border:0;border-radius:7px;cursor:pointer}
+.nav button:hover,.nav button.active{background:#263b61}
+main{min-width:0}
+.top{background:white;padding:20px 25px;border-bottom:1px solid var(--line);font-size:19px;font-weight:bold}
+.content{padding:24px}
+.page{display:none}
+.page.active{display:block}
+.panel,.stat{background:white;border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:18px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.stat strong{display:block;font-size:22px;margin-top:10px}
+.stat small{color:#64748b}
+h1{font-size:23px}
+h3{font-size:15px;margin-top:0}
+.row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.field{display:flex;flex-direction:column;gap:6px;flex:1;min-width:130px}
+label{font-size:12px;font-weight:600;color:#475569}
+input,select{padding:10px;border:1px solid #cbd5e1;border-radius:7px;width:100%;background:white}
+button,.btn{padding:9px 13px;border:1px solid #cbd5e1;background:white;border-radius:7px;cursor:pointer;font-weight:600}
+.primary{background:#2563eb;color:white;border-color:#2563eb}
+.green{background:#15803d;color:white}
+.danger{color:#b91c1c}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:10px;border-bottom:1px solid #e5eaf1;text-align:left}
+th{background:#f1f5f9;font-size:11px}
+td input,td select{padding:7px;border:1px solid transparent}
+.num{text-align:right}
+.total{font-weight:bold;background:#f8fafc}
+.notice{background:#eff6ff;padding:12px;border-radius:7px;color:#1e40af;margin:12px 0;font-size:12px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.right{text-align:right}
+@media(max-width:800px){
+.app{display:block}.sidebar{padding:12px}
+.nav{display:flex;overflow:auto;gap:4px}
+.nav button{white-space:nowrap;width:auto}
+.grid{grid-template-columns:repeat(2,1fr)}
+.content{padding:12px}
+.two{grid-template-columns:1fr}
+}
+@media print{
+.sidebar,.top,.no-print{display:none!important}
+.app{display:block}.content{padding:0}
+.page{display:none!important}.page.active{display:block!important}
+}
+</style>
 </head>
 <body>
-<div class="app-container" id="accountingApp">
+<div class="app">
 
-    <!-- Brand -->
-    <div class="brand-header">
-        <h1><span>SAFS</span> ASSOCIATE</h1>
-        <div class="badge">CA ACCOUNTING SUITE</div>
-    </div>
+<aside class="sidebar">
+<div class="brand"><span>SAFS</span> ASSOCIATE</div>
+<nav class="nav">
+<button class="active" onclick="show('dashboard',this)">Dashboard</button>
+<button onclick="show('voucher',this)">New Voucher Entry</button>
+<button onclick="show('daybook',this)">Day Book</button>
+<button onclick="show('ledger',this)">Account Ledger</button>
+<button onclick="show('trial',this)">Trial Balance</button>
+<button onclick="show('pl',this)">Profit & Loss</button>
+<button onclick="show('balance',this)">Balance Sheet</button>
+<button onclick="show('accounts',this)">Chart of Accounts</button>
+<button onclick="show('settings',this)">Backup & Settings</button>
+</nav>
+</aside>
 
-    <!-- Company tab -->
-    <div class="company-tab">
-        <label>🏢 Company Name:</label>
-        <input type="text" id="companyNameInput" placeholder="Enter company name" value="My Company">
-    </div>
+<main>
+<div class="top" id="title">Accounting Dashboard</div>
+<div class="content">
 
-    <!-- Toolbar -->
-    <div class="toolbar">
-        <button class="btn-primary" id="exportPdfBtn">📄 Export to PDF</button>
-        <button class="btn-success" id="exportExcelBtn">📊 Export to Excel</button>
-        <button class="btn-outline" id="exportWordBtn">📝 Export to Word</button>
-        <label class="file-label" for="importFile">📂 Import (JSON/XLSX/CSV)</label>
-        <input type="file" id="importFile" accept=".json,.xlsx,.xls,.csv,application/json,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv">
-    </div>
+<section id="dashboard" class="page active">
+<h1>Accounting Dashboard</h1>
+<div class="grid">
+<div class="stat"><small>Total Debit</small><strong id="dashDr">₹0.00</strong></div>
+<div class="stat"><small>Total Credit</small><strong id="dashCr">₹0.00</strong></div>
+<div class="stat"><small>Total Vouchers</small><strong id="dashCount">0</strong></div>
+<div class="stat"><small>Net Profit / Loss</small><strong id="dashProfit">₹0.00</strong></div>
+</div>
+<div class="panel">
+<h3>Recent Transactions</h3>
+<div style="overflow:auto">
+<table>
+<thead><tr><th>Date</th><th>Voucher</th><th>Type</th><th>Amount</th></tr></thead>
+<tbody id="recent"></tbody>
+</table>
+</div>
+</div>
+<button class="primary" onclick="show('voucher')">+ Create New Voucher</button>
+</section>
 
-    <!-- ============ FORMS ============ -->
-    <div class="forms-wrapper">
+<section id="voucher" class="page">
+<h1>Accounting Voucher Entry</h1>
+<div class="panel">
+<div class="row">
+<div class="field"><label>Date</label><input type="date" id="vdate"></div>
+<div class="field"><label>Voucher Type</label>
+<select id="vtype">
+<option>Journal</option><option>Payment</option>
+<option>Receipt</option><option>Contra</option>
+<option>Purchase</option><option>Sales</option>
+<option>Debit Note</option><option>Credit Note</option>
+<option>Opening Balance</option>
+</select></div>
+<div class="field"><label>Voucher Number</label><input id="vno" placeholder="Auto Number"></div>
+</div>
+<div class="field"><label>Narration</label><input id="narration" placeholder="Enter transaction details"></div>
+</div>
 
-        <!-- 1. TRIAL BALANCE -->
-        <div class="card" id="trialBalanceCard">
-            <div class="card-header">
-                <span>⚖️ Trial Balance</span>
-                <span class="sub">as on date</span>
-            </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th style="width:50%">Particulars (Account)</th>
-                        <th style="width:25%">Dr Amount</th>
-                        <th style="width:25%">Cr Amount</th>
-                    </tr>
-                </thead>
-                <tbody id="trialBody"></tbody>
-            </table>
-            <div class="row-actions">
-                <button class="btn-outline" id="addTrialRowBtn">+ Add Account Row</button>
-            </div>
-            <div class="signature-row">
-                <div>Prepared by: ___________</div>
-                <div class="date-place">Date: <span>___________</span> &nbsp; Place: <span>___________</span></div>
-            </div>
-        </div>
+<div class="panel">
+<h3>Debit / Credit Account Entries</h3>
+<div class="notice">Select account, enter amount in Debit OR Credit. Add multiple accounts to one voucher. Total Dr and Cr must match.</div>
+<div style="overflow:auto">
+<table>
+<thead><tr>
+<th>Account Name</th><th>Debit (Dr) ₹</th><th>Credit (Cr) ₹</th><th class="no-print">Action</th>
+</tr></thead>
+<tbody id="entries"></tbody>
+<tfoot><tr class="total">
+<td>TOTAL</td><td id="totalDr" class="num">0.00</td>
+<td id="totalCr" class="num">0.00</td><td></td>
+</tr></tfoot>
+</table>
+</div>
+<br>
+<button onclick="addLine('dr')">+ Debit Account</button>
+<button onclick="addLine('cr')">+ Credit Account</button>
+<div id="balanceMsg" class="notice">Not balanced</div>
+<button class="primary" onclick="saveVoucher()">Save Voucher</button>
+<button onclick="resetVoucher()">Clear Form</button>
+</div>
+</section>
 
-        <!-- 2. PROFIT & LOSS -->
-        <div class="card" id="plCard">
-            <div class="card-header">
-                <span>📈 Profit & Loss Account</span>
-                <span class="sub">for the period ending</span>
-            </div>
-            <div class="two-col-format">
-                <div>
-                    <div class="table-header-merged">Expenditure (Dr)</div>
-                    <table>
-                        <thead><tr><th style="width:70%">Account</th><th style="width:30%">Amount</th></tr></thead>
-                        <tbody id="plExpBody"></tbody>
-                    </table>
-                </div>
-                <div>
-                    <div class="table-header-merged">Income (Cr)</div>
-                    <table>
-                        <thead><tr><th style="width:70%">Account</th><th style="width:30%">Amount</th></tr></thead>
-                        <tbody id="plIncBody"></tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="row-actions">
-                <button class="btn-outline" id="addPlExpBtn">+ Add Expenditure</button>
-                <button class="btn-outline" id="addPlIncBtn">+ Add Income</button>
-            </div>
-            <div class="signature-row">
-                <div>Accountant: ___________</div>
-                <div class="date-place">Date: <span>___________</span> &nbsp; Place: <span>___________</span></div>
-            </div>
-        </div>
+<section id="daybook" class="page">
+<h1>Day Book</h1>
+<div class="panel">
+<div style="overflow:auto">
+<table>
+<thead><tr><th>Date</th><th>Voucher</th><th>Type</th><th>Narration</th><th>Amount</th><th>Action</th></tr></thead>
+<tbody id="dayRows"></tbody>
+</table>
+</div>
+</div>
+</section>
 
-        <!-- 3. CAPITAL ACCOUNT -->
-        <div class="card" id="capitalAccountCard">
-            <div class="card-header">
-                <span>💰 Capital Account</span>
-                <span class="sub">Expenditure | Income</span>
-            </div>
-            <div class="two-col-format">
-                <div>
-                    <div class="table-header-merged">Expenditure (Dr)</div>
-                    <table>
-                        <thead><tr><th style="width:70%">Account</th><th style="width:30%">Amount</th></tr></thead>
-                        <tbody id="capitalExpBody"></tbody>
-                    </table>
-                </div>
-                <div>
-                    <div class="table-header-merged">Income (Cr)</div>
-                    <table>
-                        <thead><tr><th style="width:70%">Account</th><th style="width:30%">Amount</th></tr></thead>
-                        <tbody id="capitalIncBody"></tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="row-actions">
-                <button class="btn-outline" id="addCapitalExpBtn">+ Add Expenditure</button>
-                <button class="btn-outline" id="addCapitalIncBtn">+ Add Income</button>
-            </div>
-            <div class="signature-row">
-                <div>Partner/Proprietor: ___________</div>
-                <div class="date-place">Date: <span>___________</span> &nbsp; Place: <span>___________</span></div>
-            </div>
-        </div>
+<section id="ledger" class="page">
+<h1>Account Ledger</h1>
+<div class="panel">
+<div class="field"><label>Select Account</label><select id="ledgerAccount" onchange="renderLedger()"></select></div>
+<br>
+<div style="overflow:auto">
+<table>
+<thead><tr><th>Date</th><th>Voucher</th><th>Particulars</th><th>Debit</th><th>Credit</th><th>Balance</th></tr></thead>
+<tbody id="ledgerRows"></tbody>
+</table>
+</div>
+</div>
+</section>
 
-        <!-- 4. BALANCE SHEET -->
-        <div class="card" id="balanceSheetCard">
-            <div class="card-header">
-                <span>🏦 Balance Sheet</span>
-                <span class="sub">as at end of period</span>
-            </div>
-            <div class="two-col-format">
-                <div>
-                    <div class="table-header-merged">Liabilities (Cr)</div>
-                    <table>
-                        <thead><tr><th style="width:70%">Account</th><th style="width:30%">Amount</th></tr></thead>
-                        <tbody id="bsLiabBody"></tbody>
-                    </table>
-                </div>
-                <div>
-                    <div class="table-header-merged">Assets (Dr)</div>
-                    <table>
-                        <thead><tr><th style="width:70%">Account</th><th style="width:30%">Amount</th></tr></thead>
-                        <tbody id="bsAssetBody"></tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="row-actions">
-                <button class="btn-outline" id="addBsLiabBtn">+ Add Liability</button>
-                <button class="btn-outline" id="addBsAssetBtn">+ Add Asset</button>
-            </div>
-            <div class="signature-row">
-                <div>Director/Proprietor: ___________</div>
-                <div class="date-place">Date: <span>___________</span> &nbsp; Place: <span>___________</span></div>
-            </div>
-        </div>
+<section id="trial" class="page">
+<h1>Trial Balance</h1>
+<div class="panel">
+<table>
+<thead><tr><th>Account</th><th>Group</th><th>Debit</th><th>Credit</th></tr></thead>
+<tbody id="trialRows"></tbody>
+<tfoot id="trialFoot"></tfoot>
+</table>
+<div id="trialStatus" class="notice"></div>
+</div>
+</section>
 
-    </div>
+<section id="pl" class="page">
+<h1>Profit & Loss Account</h1>
+<div class="two">
+<div class="panel"><h3>Expenses (Dr)</h3><div id="expenses"></div></div>
+<div class="panel"><h3>Income (Cr)</h3><div id="income"></div></div>
+</div>
+<div class="panel"><h3>Net Profit / Loss</h3><h2 id="netProfit">₹0.00</h2></div>
+</section>
 
-    <div class="footer">
-        <strong>© 2026 SAFS ASSOCIATE</strong> — All rights reserved.
-    </div>
+<section id="balance" class="page">
+<h1>Balance Sheet</h1>
+<div class="two">
+<div class="panel"><h3>Liabilities & Capital</h3><div id="liabilities"></div></div>
+<div class="panel"><h3>Assets</h3><div id="assets"></div></div>
+</div>
+<div class="panel" id="bsStatus"></div>
+</section>
+
+<section id="accounts" class="page">
+<h1>Chart of Accounts</h1>
+<div class="panel">
+<h3>Create New Ledger</h3>
+<div class="row">
+<div class="field"><label>Account Name</label><input id="accName" placeholder="Account Name"></div>
+<div class="field"><label>Account Group</label>
+<select id="accGroup">
+<option>Asset</option><option>Liability</option>
+<option>Capital</option><option>Income</option><option>Expense</option>
+</select></div>
+<div class="field"><label>Opening Balance</label><input id="opening" type="number" value="0"></div>
+<div class="field"><label>Opening Side</label><select id="openingSide"><option>Dr</option><option>Cr</option></select></div>
+</div>
+<button class="primary" onclick="addAccount()">Add Account</button>
+</div>
+<div class="panel">
+<table>
+<thead><tr><th>Account</th><th>Group</th><th>Opening Balance</th><th>Side</th><th>Action</th></tr></thead>
+<tbody id="accountRows"></tbody>
+</table>
+</div>
+</section>
+
+<section id="settings" class="page">
+<h1>Company & Backup</h1>
+<div class="panel">
+<div class="field"><label>Company Name</label><input id="company" value="My Company"></div><br>
+<button class="primary" onclick="saveCompany()">Save Company</button>
+</div>
+<div class="panel">
+<h3>Data Management</h3>
+<button class="green" onclick="backup()">Download JSON Backup</button>
+<label class="btn" for="restore">Restore JSON</label>
+<input id="restore" type="file" accept=".json" hidden onchange="restore(event)">
+<button onclick="exportCSV()">Export CSV</button>
+<button class="danger" onclick="clearData()">Clear All Data</button>
+</div>
+</section>
+
+</div>
+</main>
 </div>
 
 <script>
-(function(){
-    // =====================================================
-    // FULL CHART OF ACCOUNTS (as per CA standards)
-    // =====================================================
-    const CHART_OF_ACCOUNTS = [
-        // ---- ASSETS ----
-        "Cash in Hand", "Cash at Bank", "Petty Cash", "Bank - Current A/c", "Bank - Savings A/c", "Bank - OD A/c",
-        "Sundry Debtors", "Bills Receivable", "Stock in Hand", "Stock - Raw Material", "Stock - WIP", "Stock - Finished Goods",
-        "Prepaid Expenses", "Accrued Income", "Advance to Suppliers", "Advance to Staff", "Security Deposits (Asset)",
-        "Investments - LIC", "Investments - FD", "Investments - Mutual Fund", "Investments - Shares",
-        "Land & Building", "Plant & Machinery", "Furniture & Fixtures", "Office Equipment", "Computer & Peripherals",
-        "Vehicles", "Loose Tools", "Electric Fittings", "Air Conditioner", "UPS & Inverter", "Software",
-        "Goodwill", "Patent", "Trademark", "Copyright", "Preliminary Expenses", "Deferred Revenue Expenditure",
-        "Drawings", "Loan to Others", "Input CGST", "Input SGST", "Input IGST", "TDS Receivable", "GST Refund Receivable",
-        "Income Tax Refund", "Customs Duty", "Freight Inward", "Carriage Inward",
-
-        // ---- LIABILITIES ----
-        "Capital Account", "Sundry Creditors", "Bills Payable", "Bank Loan", "Bank CC A/c", "Unsecured Loan",
-        "Mortgage Loan", "Vehicle Loan", "Home Loan", "Loan from Directors", "Loan from Partners",
-        "Outstanding Expenses", "Salary Payable", "Rent Payable", "Electricity Payable", "Telephone Payable",
-        "Audit Fees Payable", "Professional Fees Payable", "TDS Payable", "Output CGST", "Output SGST", "Output IGST",
-        "GST Payable", "Income Tax Payable", "Advance from Customers", "Security Deposits (Liability)",
-        "Provision for Bad Debts", "Provision for Depreciation", "Provision for Tax", "Reserves & Surplus",
-        "General Reserve", "Statutory Reserve", "Partner's Current A/c",
-
-        // ---- INCOME ----
-        "Sales", "Sales - Local", "Sales - Inter State", "Sales - Export", "Service Income", "Consultancy Income",
-        "Commission Received", "Interest Received", "Dividend Received", "Rent Received", "Discount Received",
-        "Bad Debts Recovered", "Profit on Sale of Asset", "Exchange Rate Gain", "Miscellaneous Income",
-        "Freight Outward", "Carriage Outward", "Other Income",
-
-        // ---- EXPENDITURE ----
-        "Purchases", "Purchases - Local", "Purchases - Inter State", "Purchases - Import", "Direct Expenses",
-        "Wages", "Salary", "Bonus", "Staff Welfare", "PF Contribution", "ESI Contribution", "Gratuity",
-        "Rent", "Electricity Charges", "Water Charges", "Telephone & Internet", "Mobile Expenses",
-        "Printing & Stationery", "Postage & Courier", "Travelling Expenses", "Conveyance", "Fuel Expenses",
-        "Vehicle Maintenance", "Insurance", "Audit Fees", "Professional Fees", "Legal Fees",
-        "Accounting Charges", "Consultancy Charges", "Advertisement", "Marketing Expenses", "Business Promotion",
-        "Bank Charges", "Interest on Loan", "Interest on OD", "Interest on CC", "Interest on Late Payment",
-        "Depreciation", "Repair & Maintenance", "Office Expenses", "General Expenses", "Miscellaneous Expenses",
-        "Donation", "Subscription", "Membership Fees", "Licence & Fees", "Registration Charges",
-        "Discount Allowed", "Bad Debts", "Loss on Sale of Asset", "Exchange Rate Loss", "Freight Inward",
-        "Carriage Inward", "Commission Paid", "Brokerage", "Drawing", "Income Tax", "GST Late Fee", "Penalty",
-        "Customs Duty", "Octroi", "Entertainment Expenses", "Gift Expenses", "Meeting Expenses"
-    ];
-
-    // Sort alphabetically for a clean dropdown
-    const SORTED_ACCOUNTS = [...CHART_OF_ACCOUNTS].sort((a,b) => a.localeCompare(b));
-
-    // =====================================================
-    // DOM refs
-    // =====================================================
-    const companyNameInput = document.getElementById('companyNameInput');
-    const trialBody = document.getElementById('trialBody');
-    const plExpBody = document.getElementById('plExpBody');
-    const plIncBody = document.getElementById('plIncBody');
-    const capitalExpBody = document.getElementById('capitalExpBody');
-    const capitalIncBody = document.getElementById('capitalIncBody');
-    const bsLiabBody = document.getElementById('bsLiabBody');
-    const bsAssetBody = document.getElementById('bsAssetBody');
-
-    // =====================================================
-    // Create account dropdown (select) for a given cell
-    // =====================================================
-    function createAccountSelect(selectedValue = '') {
-        const select = document.createElement('select');
-        select.className = 'cell-select';
-        const placeholder = document.createElement('option');
-        placeholder.value = '';
-        placeholder.textContent = '— Select Account —';
-        placeholder.disabled = true;
-        if (!selectedValue) placeholder.selected = true;
-        select.appendChild(placeholder);
-
-        // Group by category
-        const groups = {
-            'ASSETS': ["Cash in Hand","Cash at Bank","Petty Cash","Bank - Current A/c","Bank - Savings A/c","Bank - OD A/c","Sundry Debtors","Bills Receivable","Stock in Hand","Stock - Raw Material","Stock - WIP","Stock - Finished Goods","Prepaid Expenses","Accrued Income","Advance to Suppliers","Advance to Staff","Security Deposits (Asset)","Investments - LIC","Investments - FD","Investments - Mutual Fund","Investments - Shares","Land & Building","Plant & Machinery","Furniture & Fixtures","Office Equipment","Computer & Peripherals","Vehicles","Loose Tools","Electric Fittings","Air Conditioner","UPS & Inverter","Software","Goodwill","Patent","Trademark","Copyright","Preliminary Expenses","Deferred Revenue Expenditure","Drawings","Loan to Others","Input CGST","Input SGST","Input IGST","TDS Receivable","GST Refund Receivable","Income Tax Refund","Customs Duty","Freight Inward","Carriage Inward"],
-            'LIABILITIES': ["Capital Account","Sundry Creditors","Bills Payable","Bank Loan","Bank CC A/c","Unsecured Loan","Mortgage Loan","Vehicle Loan","Home Loan","Loan from Directors","Loan from Partners","Outstanding Expenses","Salary Payable","Rent Payable","Electricity Payable","Telephone Payable","Audit Fees Payable","Professional Fees Payable","TDS Payable","Output CGST","Output SGST","Output IGST","GST Payable","Income Tax Payable","Advance from Customers","Security Deposits (Liability)","Provision for Bad Debts","Provision for Depreciation","Provision for Tax","Reserves & Surplus","General Reserve","Statutory Reserve","Partner's Current A/c"],
-            'INCOME': ["Sales","Sales - Local","Sales - Inter State","Sales - Export","Service Income","Consultancy Income","Commission Received","Interest Received","Dividend Received","Rent Received","Discount Received","Bad Debts Recovered","Profit on Sale of Asset","Exchange Rate Gain","Miscellaneous Income","Freight Outward","Carriage Outward","Other Income"],
-            'EXPENDITURE': ["Purchases","Purchases - Local","Purchases - Inter State","Purchases - Import","Direct Expenses","Wages","Salary","Bonus","Staff Welfare","PF Contribution","ESI Contribution","Gratuity","Rent","Electricity Charges","Water Charges","Telephone & Internet","Mobile Expenses","Printing & Stationery","Postage & Courier","Travelling Expenses","Conveyance","Fuel Expenses","Vehicle Maintenance","Insurance","Audit Fees","Professional Fees","Legal Fees","Accounting Charges","Consultancy Charges","Advertisement","Marketing Expenses","Business Promotion","Bank Charges","Interest on Loan","Interest on OD","Interest on CC","Interest on Late Payment","Depreciation","Repair & Maintenance","Office Expenses","General Expenses","Miscellaneous Expenses","Donation","Subscription","Membership Fees","Licence & Fees","Registration Charges","Discount Allowed","Bad Debts","Loss on Sale of Asset","Exchange Rate Loss","Freight Inward","Carriage Inward","Commission Paid","Brokerage","Drawing","Income Tax","GST Late Fee","Penalty","Customs Duty","Octroi","Entertainment Expenses","Gift Expenses","Meeting Expenses"]
-        };
-
-        Object.keys(groups).forEach(cat => {
-            const optgroup = document.createElement('optgroup');
-            optgroup.label = cat;
-            const sorted = [...groups[cat]].sort((a,b) => a.localeCompare(b));
-            sorted.forEach(acc => {
-                const opt = document.createElement('option');
-                opt.value = acc;
-                opt.textContent = acc;
-                if (acc === selectedValue) opt.selected = true;
-                optgroup.appendChild(opt);
-            });
-            select.appendChild(optgroup);
-        });
-
-        return select;
-    }
-
-    // =====================================================
-    // Row creators
-    // =====================================================
-    function createTrialRow(account = '', dr = '', cr = '') {
-        const tr = document.createElement('tr');
-        const td1 = document.createElement('td');
-        const select = createAccountSelect(account);
-        td1.appendChild(select);
-        const td2 = document.createElement('td');
-        const inputDr = document.createElement('input');
-        inputDr.type = 'text'; inputDr.className = 'cell-input amount-input'; inputDr.placeholder = '0.00';
-        inputDr.value = dr;
-        td2.appendChild(inputDr);
-        const td3 = document.createElement('td');
-        const inputCr = document.createElement('input');
-        inputCr.type = 'text'; inputCr.className = 'cell-input amount-input'; inputCr.placeholder = '0.00';
-        inputCr.value = cr;
-        td3.appendChild(inputCr);
-        tr.appendChild(td1); tr.appendChild(td2); tr.appendChild(td3);
-        return tr;
-    }
-
-    function createSimpleRow(account = '', amount = '') {
-        const tr = document.createElement('tr');
-        const td1 = document.createElement('td');
-        const select = createAccountSelect(account);
-        td1.appendChild(select);
-        const td2 = document.createElement('td');
-        const input2 = document.createElement('input');
-        input2.type = 'text'; input2.className = 'cell-input amount-input'; input2.placeholder = '0.00';
-        input2.value = amount;
-        td2.appendChild(input2);
-        tr.appendChild(td1); tr.appendChild(td2);
-        return tr;
-    }
-
-    // =====================================================
-    // Populate demo data (realistic CA style)
-    // =====================================================
-    function populateDemo() {
-        // Trial Balance
-        trialBody.innerHTML = '';
-        trialBody.appendChild(createTrialRow('Cash in Hand', '25,000', ''));
-        trialBody.appendChild(createTrialRow('Bank - Current A/c', '80,000', ''));
-        trialBody.appendChild(createTrialRow('Capital Account', '', '1,00,000'));
-        trialBody.appendChild(createTrialRow('Sales', '', '40,000'));
-        trialBody.appendChild(createTrialRow('Purchases', '35,000', ''));
-
-        // P&L
-        plExpBody.innerHTML = '';
-        plExpBody.appendChild(createSimpleRow('Purchases', '35,000'));
-        plExpBody.appendChild(createSimpleRow('Rent', '8,000'));
-        plExpBody.appendChild(createSimpleRow('Salary', '12,000'));
-        plExpBody.appendChild(createSimpleRow('Audit Fees', '5,000'));
-        plIncBody.innerHTML = '';
-        plIncBody.appendChild(createSimpleRow('Sales', '40,000'));
-        plIncBody.appendChild(createSimpleRow('Interest Received', '2,000'));
-        plIncBody.appendChild(createSimpleRow('Discount Received', '1,500'));
-
-        // Capital Account
-        capitalExpBody.innerHTML = '';
-        capitalExpBody.appendChild(createSimpleRow('Drawings', '10,000'));
-        capitalExpBody.appendChild(createSimpleRow('Income Tax', '5,000'));
-        capitalIncBody.innerHTML = '';
-        capitalIncBody.appendChild(createSimpleRow('Capital Account', '80,000'));
-        capitalIncBody.appendChild(createSimpleRow('Net Profit', '30,000'));
-
-        // Balance Sheet
-        bsLiabBody.innerHTML = '';
-        bsLiabBody.appendChild(createSimpleRow('Capital Account', '1,00,000'));
-        bsLiabBody.appendChild(createSimpleRow('Sundry Creditors', '50,000'));
-        bsLiabBody.appendChild(createSimpleRow('Bank Loan', '25,000'));
-        bsAssetBody.innerHTML = '';
-        bsAssetBody.appendChild(createSimpleRow('Cash in Hand', '25,000'));
-        bsAssetBody.appendChild(createSimpleRow('Bank - Current A/c', '80,000'));
-        bsAssetBody.appendChild(createSimpleRow('Furniture & Fixtures', '30,000'));
-        bsAssetBody.appendChild(createSimpleRow('Sundry Debtors', '40,000'));
-    }
-    populateDemo();
-
-    // =====================================================
-    // Add row handlers
-    // =====================================================
-    document.getElementById('addTrialRowBtn').addEventListener('click', () => trialBody.appendChild(createTrialRow('', '', '')));
-    document.getElementById('addPlExpBtn').addEventListener('click', () => plExpBody.appendChild(createSimpleRow('', '')));
-    document.getElementById('addPlIncBtn').addEventListener('click', () => plIncBody.appendChild(createSimpleRow('', '')));
-    document.getElementById('addCapitalExpBtn').addEventListener('click', () => capitalExpBody.appendChild(createSimpleRow('', '')));
-    document.getElementById('addCapitalIncBtn').addEventListener('click', () => capitalIncBody.appendChild(createSimpleRow('', '')));
-    document.getElementById('addBsLiabBtn').addEventListener('click', () => bsLiabBody.appendChild(createSimpleRow('', '')));
-    document.getElementById('addBsAssetBtn').addEventListener('click', () => bsAssetBody.appendChild(createSimpleRow('', '')));
-
-    // =====================================================
-    // EXPORT PDF
-    // =====================================================
-    document.getElementById('exportPdfBtn').addEventListener('click', function() {
-        const element = document.getElementById('accountingApp');
-        const companyName = companyNameInput.value.trim() || 'Company';
-        const clone = element.cloneNode(true);
-
-        // Hide toolbar & company tab in PDF
-        const toolbar = clone.querySelector('.toolbar');
-        if (toolbar) toolbar.remove();
-        const companyTab = clone.querySelector('.company-tab');
-        if (companyTab) companyTab.remove();
-        const rowActions = clone.querySelectorAll('.row-actions');
-        rowActions.forEach(el => el.remove());
-
-        // Add company name header for PDF
-        const companyDiv = document.createElement('div');
-        companyDiv.style.textAlign = 'center';
-        companyDiv.style.padding = '10px 0';
-        companyDiv.style.fontSize = '1.5rem';
-        companyDiv.style.fontWeight = '700';
-        companyDiv.style.color = '#0f172a';
-        companyDiv.textContent = companyName;
-        const brand = clone.querySelector('.brand-header');
-        if (brand && brand.parentNode) {
-            brand.parentNode.insertBefore(companyDiv, brand.nextSibling);
-        }
-
-        // Ensure selects show selected text in PDF (convert selects to spans)
-        clone.querySelectorAll('select.cell-select').forEach(sel => {
-            const span = document.createElement('span');
-            span.style.display = 'block';
-            span.style.padding = '7px 4px';
-            span.style.fontWeight = '500';
-            span.style.fontSize = '0.9rem';
-            span.textContent = sel.value || '—';
-            sel.parentNode.replaceChild(span, sel);
-        });
-
-        const opt = {
-            margin: [0.5, 0.5, 0.5, 0.5],
-            filename: `${companyName.replace(/\s+/g, '_')}_Accounting_Report.pdf`,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, letterRendering: true, useCORS: true, logging: false },
-            jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
-        };
-        html2pdf().set(opt).from(clone).save();
-    });
-
-    // =====================================================
-    // EXPORT EXCEL
-    // =====================================================
-    document.getElementById('exportExcelBtn').addEventListener('click', function() {
-        const wb = XLSX.utils.book_new();
-
-        function extractTable(body, isTrial = false) {
-            const rows = [];
-            if (isTrial) {
-                rows.push(['Particulars', 'Dr Amount', 'Cr Amount']);
-                body.querySelectorAll('tr').forEach(tr => {
-                    const sel = tr.querySelector('select');
-                    const inputs = tr.querySelectorAll('input');
-                    if (sel && inputs.length === 2) {
-                        rows.push([sel.value, inputs[0].value, inputs[1].value]);
-                    }
-                });
-            } else {
-                rows.push(['Particulars', 'Amount']);
-                body.querySelectorAll('tr').forEach(tr => {
-                    const sel = tr.querySelector('select');
-                    const inp = tr.querySelector('input');
-                    if (sel && inp) {
-                        rows.push([sel.value, inp.value]);
-                    }
-                });
-            }
-            return rows;
-        }
-
-        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(extractTable(trialBody, true)), 'Trial Balance');
-        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(extractTable(plExpBody)), 'P&L Expenditure');
-        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(extractTable(plIncBody)), 'P&L Income');
-        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(extractTable(capitalExpBody)), 'Capital Expenditure');
-        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(extractTable(capitalIncBody)), 'Capital Income');
-        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(extractTable(bsLiabBody)), 'BS Liabilities');
-        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(extractTable(bsAssetBody)), 'BS Assets');
-
-        const companyName = companyNameInput.value.trim() || 'Company';
-        XLSX.writeFile(wb, `${companyName.replace(/\s+/g, '_')}_Accounting.xlsx`);
-    });
-
-    // =====================================================
-    // EXPORT WORD
-    // =====================================================
-    document.getElementById('exportWordBtn').addEventListener('click', function() {
-        const companyName = companyNameInput.value.trim() || 'Company';
-        const content = document.getElementById('accountingApp').cloneNode(true);
-        const toolbar = content.querySelector('.toolbar');
-        if (toolbar) toolbar.remove();
-        const companyTab = content.querySelector('.company-tab');
-        if (
+const KEY='safs_ca_books';
+const defaults=[
+['Cash in Hand','Asset'],['Cash at Bank','Asset'],['Bank Current Account','Asset'],
+['Petty Cash','Asset'],['Sundry Debtors','Asset'],['Bills Receivable','Asset'],
+['Stock in Hand','Asset'],['Furniture & Fixtures','Asset'],['Computer & Peripherals','Asset'],
+['Plant & Machinery','Asset'],['Land & Building','Asset'],['Input CGST','Asset'],
+['Input SGST','Asset'],['Input IGST','Asset'],['TDS Receivable','Asset'],
+['Capital Account','Capital'],['Drawings','Capital'],['Reserves & Surplus','Capital'],
+['Sundry Creditors','Liability'],['Bank Loan','Liability'],['Unsecured Loan','Liability'],
+['Outstanding Expenses','Liability'],['Salary Payable','Liability'],
+['Rent Payable','Liability'],['TDS Payable','Liability'],['Output CGST','Liability'],
+['Output SGST','Liability'],['Output IGST','Liability'],['GST Payable','Liability'],
+['Sales','Income'],['Sales Local','Income'],['Sales Interstate','Income'],
+['Service Income','Income'],['Commission Received','Income'],
+['Interest Received','Income'],['Discount Received','Income'],['Other Income','Income'],
+['Purchases','Expense'],['Wages','Expense'],['Salary','Expense'],
+['Rent','Expense'],['Electricity Charges','Expense'],['Telephone & Internet','Expense'],
+['Printing & Stationery','Expense'],['Travelling Expenses','Expense'],
+['Conveyance','Expense'],['Fuel Expenses','Expense'],['Vehicle Maintenance','Expense'],
+['Insurance','Expense'],['Audit Fees','Expense'],['Professional Fees','Expense'],
+['Legal Fees','Expense'],['Accounting Charges','Expense'],['Bank Charges','Expense'],
+['Interest on Loan','Expense'],['Depreciation','Expense'],['Repairs & Maintenance','Expense'],
+['Office Expenses','Expense'],['Advertisement','Expense'],['Commission Paid','Expense'],
+['Bad Debts','Expense'],['GST Late Fee','Expense'],['Penalty','Expense'],
+['Freight Inward','Expense'],['Carriage Inward','Expense'],['Discount Allowed','Expense'],
+['Income Tax','Expense']
+];
+let db;
+try{db=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+if(!db||!Array.isArray(db.accounts)||!Array.isArray(db.vouchers)){
+db={company:'My Company',accounts:defaults.map(x=>({id:uid(),name:x[0],group:x[1],opening:0,side:['Liability','Capital','Income'].includes(x[1])?'Cr':'Dr'})),vouchers:[]};
+}
+function uid(){return Math.random().toString(36).slice(2)+Date.now().toString(36)}
+function save(){localStorage.setItem(KEY,JSON.stringify(db));refresh()}
+function fmt(n){return '₹'+Number(n||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})}
+function safe(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function show(id,btn){
+document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+document.getElementById(id).classList.add('active');
+document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));
+if(btn)btn.classList.add('active');
+document.getElementById('title').textContent=id==='pl'?'Profit & Loss Account':id==='bs'?'Balance Sheet':id==='dashboard'?'Accounting Dashboard':id==='voucher'?'Voucher Entry':id.toUpperCase();
+refresh();
+}
+function accountOptions(value=''){
+return '<option value="">Select Account</option>'+db.accounts.slice().sort((a,b)=>a.name.localeCompare(b.name)).map(a=>`<option value="${a.id}" ${a.id===value?'selected':''}>${safe(a.name)} (${a.group})</option>`).join('');
+}
+function addLine(side){
+let tr=document.createElement('tr');
+tr.innerHTML=`<td><select class="account">${accountOptions()}</select></td>
+<td><input class="dr num" type="number" min="0" step="0.01" placeholder="0.00"></td>
+<td><input class="cr num" type="number" min="0" step="0.01" placeholder="0.00"></td>
+<td class="no-print"><button class="danger">×</button></td>`;
+let dr=tr.querySelector('.dr'),cr=tr.querySelector('.cr');
+dr.addEventListener('input',()=>{if(+dr.value)cr.value='';totals()});
+cr.addEventListener('input',()=>{if(+cr.value)dr.value='';totals()});
+tr.querySelector('button').onclick=()=>{tr.remove();totals()};
+document.getElementById('entries').appendChild(tr);
+(side==='dr'?dr:cr).focus();
+}
+function totals(){
+let d=0,c=0;
+document.querySelectorAll('#entries tr').forEach(r=>{d+=Number(r.querySelector('.dr').value)||0;c+=Number(r.querySelector('.cr').value)||0});
+document.getElementById('totalDr').textContent=d.toFixed(2);
+document.getElementById('totalCr').textContent=c.toFixed(2);
+document.getElementById('balanceMsg').textContent=d>0&&Math.abs(d-c)<.005?'✓ Voucher Balanced':`Difference: ${fmt(Math.abs(d-c))}`;
+}
+function resetVoucher(){
+document.getElementById('entries').innerHTML='';
+document.getElementById('vdate').value=new Date().toISOString().slice(0,10);
+document.getElementById('vno').value='';
+document.getElementById('narration').value='';
+addLine('dr');addLine('cr');
+}
+function saveVoucher(){
+let rows=[...document.querySelectorAll('#entries tr')].map(r=>({
+account:r.querySelector('.account').value,
+dr:Number(r.querySelector('.dr').value)||0,
+cr:Number(r.querySelector('.cr').value)||0
+})).filter(r=>r.account&&(r.dr||r.cr));
+let d=rows.reduce((s,r)=>s+r.dr,0),c=rows.reduce((s,r)=>s+r.cr,0);
+if(rows.length<2)return alert('At least two account entries required.');
+if(rows.some(r=>r.dr>0&&r.cr>0))return alert('One row cannot have both Dr and Cr.');
+if(!d||Math.abs(d-c)>.004)return alert('Debit and Credit must be equal.');
+let no=document.getElementById('vno').value.trim()||'JV-'+String(db.vouchers.length+1).padStart(5,'0');
+if(db.vouchers.some(v=>v.no===no))return alert('Voucher number already exists.');
+db.vouchers.push({
+id:uid(),date:document.getElementById('vdate').value,
+no,type:document.getElementById('vtype').value,
+narration:document.getElementById('narration').value,
+rows
+});
+save();alert('Voucher saved successfully.');resetVoucher();show('daybook');
+}
+function balances(){
+let b={};db.accounts.forEach(a=>b[a.id]={dr:a.side==='Dr'?+a.opening:0,cr:a.side==='Cr'?+a.opening:0});
+db.vouchers.forEach(v=>v.rows.forEach(r=>{if(!b[r.account])return;b[r.account].dr+=r.dr;b[r.account].cr+=r.cr}));
+return b;
+}
+function linesFor(account){
+let out=[];
+db.vouchers.forEach(v=>v.rows.forEach(r=>{if(r.account===account)out.push({...r,date:v.date,no:v.no,narration:v.narration,type:v.type,vid:v.id})}));
+return out.sort((a,b)=>a.date.localeCompare(b.date));
+}
+function profit(){
+let b=balances(),income=0,expense=0;
+db.accounts.forEach(a=>{
+let x=b[a.id],net=x.cr-x.dr;
+if(a.group==='Income')income+=net;
+if(a.group==='Expense')expense-=net;
+});
+return {income,expense,net:income-expense};
+}
+function renderTrial(){
+let b=balances(),d=0,c=0;
+document.getElementById('trialRows').innerHTML=db.accounts.map(a=>{
+let n=b[a.id].dr-b[a.id].cr,dr=Math.max(n,0),cr=Math.max(-n,0);
+d+=dr;c+=cr;
+return dr||cr?`<tr><td>${safe(a.name)}</td><td>${a.group}</td><td class="num">${fmt(dr)}</td><td class="num">${fmt(cr)}</td></tr>`:'';
+}).join('');
+document.getElementById('trialFoot').innerHTML=`<tr class="total"><td colspan="2">TOTAL</td><td>${fmt(d)}</td><td>${fmt(c)}</td></tr>`;
+document.getElementById('trialStatus').textContent=Math.abs(d-c)<.005?'Trial Balance agrees ✓':'Difference: '+fmt(Math.abs(d-c));
+}
+function renderLedger(){
+let id=document.getElementById('ledgerAccount').value;
+let a=db.accounts.find(x=>x.id===id),run=0;
+if(!a){document.getElementById('ledgerRows').innerHTML='';return}
+let opening=a.side==='Dr'?+a.opening:-a.opening;
+run=opening;
+let html=`<tr><td>Opening</td><td>—</td><td>Opening Balance</td><td>${fmt(Math.max(opening,0))}</td><td>${fmt(Math.max(-opening,0))}</td><td>${fmt(Math.abs(run))} ${run>=0?'Dr':'Cr'}</td></tr>`;
+linesFor(id).forEach(r=>{
+run+=r.dr-r.cr;
+html+=`<tr><td>${r.date}</td><td>${safe(r.no)}</td><td>${safe(r.narration||r.type)}</td><td>${fmt(r.dr)}</td><td>${fmt(r.cr)}</td><td>${fmt(Math.abs(run))} ${run>=0?'Dr':'Cr'}</td></tr>`;
+});
+document.getElementById('ledgerRows').innerHTML=html;
+}
+function table(rows){
+return '<table><thead><tr><th>Account</th><th>Amount</th></tr></thead><tbody>'+rows.map(x=>`<tr><td>${safe(x.name)}</td><td>${fmt(x.amount)}</td></tr>`).join('')+'</tbody></table>';
+}
+function renderPL(){
+let b=balances(),ex=[],inc=[];
+db.accounts.forEach(a=>{
+let x=b[a.id];
+if(a.group==='Income'&&x.cr!==x.dr)inc.push({name:a.name,amount:x.cr-x.dr});
+if(a.group==='Expense'&&x.dr!==x.cr)ex.push({name:a.name,amount:x.dr-x.cr});
+});
+let p=profit();
+document.getElementById('expenses').innerHTML=table(ex);
+document.getElementById('income').innerHTML=table(inc);
+document.getElementById('netProfit').textContent=(p.net>=0?'Net Profit: ':'Net Loss: ')+fmt(Math.abs(p.net));
+}
+function renderBalance(){
+let b=balances(),assets=[],liabs=[],at=0,lt=0;
+db.accounts.forEach(a=>{
+let x=b[a.id],n=x.dr-x.cr;
+if(a.group==='Asset'&&n){assets.push({name:a.name,amount:n});at+=n}
+if(['Liability','Capital'].includes(a.group)&&n){liabs.push({name:a.name,amount:-n});lt-=n}
+});
+let p=profit();
+if(p.net){liabs.push({name:'Current Year Profit / Loss',amount:p.net});lt+=p.net}
+document.getElementById('assets').innerHTML=table(assets);
+document.getElementById('liabilities').innerHTML=table(liabs);
+document.getElementById('bsStatus').textContent=Math.abs(at-lt)<.01?'Balance Sheet agrees ✓':'Difference: '+fmt(Math.abs(at-lt));
+}
+function renderAccounts(){
+document.getElementById('accountRows').innerHTML=db.accounts.map(a=>`<tr><td>${safe(a.name)}</td><td>${a.group}</td><td>${fmt(a.opening)}</td><td>${a.side}</td><td><button onclick="deleteAccount('${a.id}')">Delete</button></td></tr>`).join('');
+document.getElementById('ledgerAccount').innerHTML=accountOptions(document.getElementById('ledgerAccount').value);
+}
+function addAccount(){
+let name=document.getElementById('accName').value.trim();
+if(!name)return alert('Enter account name.');
+if(db.accounts.some(a=>a.name.toLowerCase()===name.toLowerCase()))return alert('Account already exists.');
+db.accounts.push({id:uid(),name,group:document.getElementById('accGroup').value,opening:Number(document.getElementById('opening').value)||0,side:document.getElementById('openingSide').value});
+document.getElementById('accName').value='';
+save();
+}
+function deleteAccount(id){
+if(db.vouchers.some(v=>v.rows.some(r=>r.account===id)))return alert('Account is already used in vouchers.');
+if(!confirm('Delete this account?'))return;
+db.accounts=db.accounts.filter(a=>a.id!==id);save();
+}
+function renderDay(){
+document.getElementById('dayRows').innerHTML=db.vouchers.slice().reverse().map(v=>`<tr><td>${v.date}</td><td>${safe(v.no)}</td><td>${v.type}</td><td>${safe(v.narration)}</td><td>${fmt(v.rows.reduce((s,r)=>s+r.dr,0))}</td><td><button onclick="deleteVoucher('${v.id}')">Delete</button></td></tr>`).join('');
+}
+function deleteVoucher(id){
+if(!confirm('Delete voucher?'))return;
+db.vouchers=db.vouchers.filter(v=>v.id!==id);save();
+}
+function refresh(){
+document.getElementById('company').value=db.company||'My Company';
+document.getElementById('dashCount').textContent=db.vouchers.length;
+let b=balances(),d=0,c=0;
+Object.values(b).forEach(x=>{d+=x.dr;c+=x.cr});
+document.getElementById('dashDr').textContent=fmt(d);
+document.getElementById('dashCr').textContent=fmt(c);
+document.getElementById('dashProfit').textContent=fmt(profit().net);
+document.getElementById('recent').innerHTML=db.vouchers.slice(-5).reverse().map(v=>`<tr><td>${v.date}</td><td>${safe(v.no)}</td><td>${v.type}</td><td>${fmt(v.rows.reduce((s,r)=>s+r.dr,0))}</td></tr>`).join('');
+renderAccounts();renderDay();renderTrial();renderLedger();renderPL();renderBalance();
+}
+function saveCompany(){db.company=document.getElementById('company').value.trim()||'My Company';save();alert('Company saved.')}
+function backup(){download(JSON.stringify(db,null,2),'SAFS_Accounting_Backup.json','application/json')}
+function restore(e){
+let f=e.target.files[0];if(!f)return;
+let r=new FileReader();
+r.onload=()=>{try{let x=JSON.parse(r.result);if(!Array.isArray(x.accounts)||!Array.isArray(x.vouchers))throw 0;if(!confirm('Replace current data with backup?'))return;db=x;save();alert('Backup restored.')}catch(err){alert('Invalid backup file.')}};
+r.readAsText(f);
+}
+function exportCSV(){
+let rows=[['Date','Voucher','Type','Account','Group','Debit','Credit']];
+db.vouchers.forEach(v=>v.rows.forEach(r=>{let a=db.accounts.find(x=>x.id===r.account);rows.push([v.date,v.no,v.type,a?.name||'',a?.group||'',r.dr,r.cr])}));
+let csv=rows.map(r=>r.map(x=>'"'+String(x??'').replace(/"/g,'""')+'"').join(',')).join('\n');
+download(csv,'SAFS_Vouchers.csv','text/csv');
+}
+function download(data,name,type){
+let a=document.createElement('a'),url=URL.createObjectURL(new Blob([data],{type}));
+a.href=url;a.download=name;a.click();URL.revokeObjectURL(url);
+}
+function clearData(){
+if(!confirm('Permanently delete all vouchers and accounts? Download backup first.'))return;
+localStorage.removeItem(KEY);location.reload();
+}
+window.show=show;window.addLine=addLine;window.saveVoucher=saveVoucher;window.resetVoucher=resetVoucher;window.addAccount=addAccount;window.deleteAccount=deleteAccount;window.deleteVoucher=deleteVoucher;window.backup=backup;window.restore=restore;window.exportCSV=exportCSV;window.saveCompany=saveCompany;window.clearData=clearData;
+document.getElementById('vdate').value=new Date().toISOString().slice(0,10);
+resetVoucher();refresh();
+</script>
+</body>
+</html>
