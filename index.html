@@ -4,469 +4,633 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SAFS Professional Accounting Suite</title>
+<title>SAFS ASSOCIATE | CA Accounting Suite</title>
+
+<!-- Export Libraries -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
 <style>
-:root{--navy:#101c36;--blue:#2563eb;--bg:#f3f6fb;--line:#dce3ee}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);font-family:Segoe UI,Arial;color:#172033}
-.app{display:grid;grid-template-columns:230px 1fr;min-height:100vh}
-.sidebar{background:#101c36;color:white;padding:20px}
-.brand{font-size:22px;font-weight:bold;margin-bottom:25px}
-.brand span{color:#60a5fa}
-.nav button{display:block;width:100%;text-align:left;padding:12px;margin:4px 0;background:transparent;color:#dbeafe;border:0;border-radius:7px;cursor:pointer}
-.nav button:hover,.nav button.active{background:#263b61}
-main{min-width:0}
-.top{background:white;padding:20px 25px;border-bottom:1px solid var(--line);font-size:19px;font-weight:bold}
-.content{padding:24px}
-.page{display:none}
-.page.active{display:block}
-.panel,.stat{background:white;border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:18px}
-.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
-.stat strong{display:block;font-size:22px;margin-top:10px}
-.stat small{color:#64748b}
-h1{font-size:23px}
-h3{font-size:15px;margin-top:0}
-.row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px}
-.field{display:flex;flex-direction:column;gap:6px;flex:1;min-width:130px}
-label{font-size:12px;font-weight:600;color:#475569}
-input,select{padding:10px;border:1px solid #cbd5e1;border-radius:7px;width:100%;background:white}
-button,.btn{padding:9px 13px;border:1px solid #cbd5e1;background:white;border-radius:7px;cursor:pointer;font-weight:600}
-.primary{background:#2563eb;color:white;border-color:#2563eb}
-.green{background:#15803d;color:white}
-.danger{color:#b91c1c}
-table{width:100%;border-collapse:collapse;font-size:13px}
-th,td{padding:10px;border-bottom:1px solid #e5eaf1;text-align:left}
-th{background:#f1f5f9;font-size:11px}
-td input,td select{padding:7px;border:1px solid transparent}
-.num{text-align:right}
-.total{font-weight:bold;background:#f8fafc}
-.notice{background:#eff6ff;padding:12px;border-radius:7px;color:#1e40af;margin:12px 0;font-size:12px}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:15px}
-.right{text-align:right}
-@media(max-width:800px){
-.app{display:block}.sidebar{padding:12px}
-.nav{display:flex;overflow:auto;gap:4px}
-.nav button{white-space:nowrap;width:auto}
-.grid{grid-template-columns:repeat(2,1fr)}
-.content{padding:12px}
-.two{grid-template-columns:1fr}
+:root{
+ --navy:#101d35;--blue:#2456a6;--light:#f3f6fb;
+ --white:#fff;--text:#26354a;--muted:#718096;
+ --green:#13875b;--red:#d64545;--border:#e1e7ef;
 }
-@media print{
-.sidebar,.top,.no-print{display:none!important}
-.app{display:block}.content{padding:0}
-.page{display:none!important}.page.active{display:block!important}
+*{box-sizing:border-box}
+body{margin:0;background:var(--light);font-family:Arial,sans-serif;color:var(--text)}
+header{
+ background:linear-gradient(110deg,#101d35,#2456a6);
+ color:white;padding:17px 24px;display:flex;
+ justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap;
+}
+.brand{font-size:22px;font-weight:800;letter-spacing:1px}
+.brand small{display:block;font-size:11px;font-weight:400;letter-spacing:2px;margin-top:5px;color:#d6e2f8}
+.header-right{font-size:12px;color:#e5edff}
+.layout{display:flex;min-height:calc(100vh - 75px)}
+.sidebar{
+ width:235px;background:var(--navy);color:white;padding:18px 12px;
+ flex-shrink:0;
+}
+.sidebar h4{color:#91a9cf;font-size:11px;padding-left:12px;letter-spacing:1px}
+.nav{
+ display:block;width:100%;border:0;background:transparent;color:#dce6f7;
+ text-align:left;padding:12px;border-radius:7px;margin:3px 0;
+ cursor:pointer;font-size:13px;
+}
+.nav:hover,.nav.active{background:#294b7b;color:white}
+.main{flex:1;padding:24px;min-width:0}
+.page{display:none}.page.active{display:block}
+h2{font-size:22px;margin:0 0 18px;color:#172b4d}
+h3{font-size:15px;margin:0 0 15px}
+.card{
+ background:white;border:1px solid var(--border);border-radius:11px;
+ padding:18px;margin-bottom:18px;box-shadow:0 3px 12px #162b4d08;
+}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px}
+.stat{background:white;padding:19px;border-radius:10px;border:1px solid var(--border)}
+.stat small{color:var(--muted);font-size:12px}
+.stat strong{display:block;font-size:23px;margin-top:9px;color:#1b3d70}
+input,select,textarea{
+ padding:10px;border:1px solid #d7dfeb;border-radius:6px;
+ width:100%;font-size:13px;background:white;color:var(--text);
+}
+label{font-size:12px;font-weight:bold;display:block;margin-bottom:6px}
+.field{min-width:140px;flex:1}
+.formrow{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+button{
+ cursor:pointer;border:0;border-radius:6px;padding:10px 14px;
+ font-size:12px;font-weight:bold;background:var(--blue);color:white;
+}
+button:hover{filter:brightness(1.1)}
+.secondary{background:#e9eff8;color:#24436f}
+.success{background:var(--green)}
+.danger{background:var(--red)}
+.dark{background:#172b4d}
+table{width:100%;border-collapse:collapse;font-size:12px;min-width:650px}
+th{background:#edf2f9;color:#314867;text-align:left}
+td,th{padding:11px 9px;border-bottom:1px solid var(--border)}
+.table-wrap{overflow-x:auto}
+.right{text-align:right}
+.green{color:var(--green)}.red{color:var(--red)}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.line-row{
+ display:grid;grid-template-columns:1fr 1fr 130px 85px 85px 45px;
+ gap:8px;margin-bottom:9px;align-items:center;
+}
+.line-head{font-size:11px;color:var(--muted);font-weight:bold;margin-bottom:8px}
+.balance{font-size:13px;font-weight:bold;padding:12px;background:#f1f5fb;border-radius:7px}
+.calculator{background:#172b4d;padding:14px;border-radius:10px;color:white}
+.calc-display{background:#fff;color:#142644;text-align:right;font-size:23px;padding:13px;border-radius:6px;margin-bottom:10px;min-height:52px;overflow:hidden}
+.calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.calc-grid button{padding:13px 4px;background:#314e79}
+.calc-grid button.op{background:#d5e4ff;color:#17345e}
+.calc-grid button.equal{background:#13875b}
+.calc-grid button.clear{background:#b83c48}
+footer{text-align:center;background:#101d35;color:#dce6f7;padding:16px;font-size:12px}
+@media(max-width:760px){
+ .layout{display:block}.sidebar{width:100%;display:flex;overflow-x:auto;padding:8px}
+ .sidebar h4{display:none}.nav{white-space:nowrap;width:auto}
+ .main{padding:13px}.line-row{grid-template-columns:1fr 1fr}
+ header{padding:14px}
 }
 </style>
 </head>
-<body>
-<div class="app">
 
+<body>
+<header>
+ <div class="brand">SAFS ASSOCIATE
+  <small>PROFESSIONAL CA ACCOUNTING SUITE</small>
+ </div>
+ <div class="header-right">Accounting Management System | 2026</div>
+</header>
+
+<div class="layout">
 <aside class="sidebar">
-<div class="brand"><span>SAFS</span> ASSOCIATE</div>
-<nav class="nav">
-<button class="active" onclick="show('dashboard',this)">Dashboard</button>
-<button onclick="show('voucher',this)">New Voucher Entry</button>
-<button onclick="show('daybook',this)">Day Book</button>
-<button onclick="show('ledger',this)">Account Ledger</button>
-<button onclick="show('trial',this)">Trial Balance</button>
-<button onclick="show('pl',this)">Profit & Loss</button>
-<button onclick="show('balance',this)">Balance Sheet</button>
-<button onclick="show('accounts',this)">Chart of Accounts</button>
-<button onclick="show('settings',this)">Backup & Settings</button>
-</nav>
+ <h4>ACCOUNTING MENU</h4>
+ <button class="nav active" onclick="showPage('dashboard',this)">▦ Dashboard</button>
+ <button class="nav" onclick="showPage('voucher',this)">＋ Voucher Entry</button>
+ <button class="nav" onclick="showPage('daybook',this)">▤ Day Book</button>
+ <button class="nav" onclick="showPage('ledger',this)">▥ Account Ledger</button>
+ <button class="nav" onclick="showPage('trial',this)">▤ Trial Balance</button>
+ <button class="nav" onclick="showPage('pl',this)">↗ Profit & Loss</button>
+ <button class="nav" onclick="showPage('balance',this)">▣ Balance Sheet</button>
+ <button class="nav" onclick="showPage('accounts',this)">☷ Chart of Accounts</button>
+ <button class="nav" onclick="showPage('calculator',this)">⊞ Calculator</button>
+ <button class="nav" onclick="showPage('backup',this)">⇩ Backup & Export</button>
 </aside>
 
-<main>
-<div class="top" id="title">Accounting Dashboard</div>
-<div class="content">
+<main class="main">
 
 <section id="dashboard" class="page active">
-<h1>Accounting Dashboard</h1>
-<div class="grid">
-<div class="stat"><small>Total Debit</small><strong id="dashDr">₹0.00</strong></div>
-<div class="stat"><small>Total Credit</small><strong id="dashCr">₹0.00</strong></div>
-<div class="stat"><small>Total Vouchers</small><strong id="dashCount">0</strong></div>
-<div class="stat"><small>Net Profit / Loss</small><strong id="dashProfit">₹0.00</strong></div>
-</div>
-<div class="panel">
-<h3>Recent Transactions</h3>
-<div style="overflow:auto">
-<table>
-<thead><tr><th>Date</th><th>Voucher</th><th>Type</th><th>Amount</th></tr></thead>
-<tbody id="recent"></tbody>
-</table>
-</div>
-</div>
-<button class="primary" onclick="show('voucher')">+ Create New Voucher</button>
+ <h2>Dashboard</h2>
+ <div class="cards">
+  <div class="stat"><small>Total Vouchers</small><strong id="dVouchers">0</strong></div>
+  <div class="stat"><small>Total Debit</small><strong id="dDebit">₹0.00</strong></div>
+  <div class="stat"><small>Total Credit</small><strong id="dCredit">₹0.00</strong></div>
+  <div class="stat"><small>Difference</small><strong id="dDifference">₹0.00</strong></div>
+ </div>
+ <div class="card" style="margin-top:20px">
+  <h3>Recent Transactions</h3>
+  <div class="table-wrap" id="recentTable"></div>
+ </div>
+ <div class="card">
+  <h3>Accounting Information</h3>
+  <p style="font-size:13px;color:#718096">Enter balanced vouchers to automatically update your Day Book, Ledger, Trial Balance, Profit & Loss and Balance Sheet.</p>
+ </div>
 </section>
 
 <section id="voucher" class="page">
-<h1>Accounting Voucher Entry</h1>
-<div class="panel">
-<div class="row">
-<div class="field"><label>Date</label><input type="date" id="vdate"></div>
-<div class="field"><label>Voucher Type</label>
-<select id="vtype">
-<option>Journal</option><option>Payment</option>
-<option>Receipt</option><option>Contra</option>
-<option>Purchase</option><option>Sales</option>
-<option>Debit Note</option><option>Credit Note</option>
-<option>Opening Balance</option>
-</select></div>
-<div class="field"><label>Voucher Number</label><input id="vno" placeholder="Auto Number"></div>
-</div>
-<div class="field"><label>Narration</label><input id="narration" placeholder="Enter transaction details"></div>
-</div>
+ <h2>Voucher Entry</h2>
+ <div class="card">
+  <div class="formrow">
+   <div class="field"><label>Voucher Type</label>
+    <select id="vType">
+     <option>Journal</option><option>Payment</option><option>Receipt</option>
+     <option>Contra</option><option>Purchase</option><option>Sales</option>
+    </select>
+   </div>
+   <div class="field"><label>Voucher Date</label><input type="date" id="vDate"></div>
+   <div class="field"><label>Voucher Number</label><input id="vNumber" readonly></div>
+  </div>
+  <div class="field" style="margin-bottom:15px"><label>Narration / Description</label><input id="vNarration" placeholder="Enter transaction details"></div>
 
-<div class="panel">
-<h3>Debit / Credit Account Entries</h3>
-<div class="notice">Select account, enter amount in Debit OR Credit. Add multiple accounts to one voucher. Total Dr and Cr must match.</div>
-<div style="overflow:auto">
-<table>
-<thead><tr>
-<th>Account Name</th><th>Debit (Dr) ₹</th><th>Credit (Cr) ₹</th><th class="no-print">Action</th>
-</tr></thead>
-<tbody id="entries"></tbody>
-<tfoot><tr class="total">
-<td>TOTAL</td><td id="totalDr" class="num">0.00</td>
-<td id="totalCr" class="num">0.00</td><td></td>
-</tr></tfoot>
-</table>
-</div>
-<br>
-<button onclick="addLine('dr')">+ Debit Account</button>
-<button onclick="addLine('cr')">+ Credit Account</button>
-<div id="balanceMsg" class="notice">Not balanced</div>
-<button class="primary" onclick="saveVoucher()">Save Voucher</button>
-<button onclick="resetVoucher()">Clear Form</button>
-</div>
+  <h3>Debit / Credit Entries</h3>
+  <div class="line-row line-head">
+   <div>Debit Account</div><div>Credit Account</div><div>Amount</div><div>Dr Total</div><div>Cr Total</div><div></div>
+  </div>
+  <div id="voucherLines"></div>
+  <div class="actions">
+   <button class="secondary" onclick="addVoucherLine()">＋ Add Line</button>
+   <button class="secondary" onclick="openCalc()">⊞ Calculator</button>
+  </div>
+  <div class="balance" id="voucherTotal">Debit: ₹0.00 | Credit: ₹0.00 | Difference: ₹0.00</div>
+  <div class="actions">
+   <button class="success" onclick="saveVoucher()">Save Voucher</button>
+   <button class="secondary" onclick="resetVoucher()">Clear</button>
+  </div>
+ </div>
 </section>
 
 <section id="daybook" class="page">
-<h1>Day Book</h1>
-<div class="panel">
-<div style="overflow:auto">
-<table>
-<thead><tr><th>Date</th><th>Voucher</th><th>Type</th><th>Narration</th><th>Amount</th><th>Action</th></tr></thead>
-<tbody id="dayRows"></tbody>
-</table>
-</div>
-</div>
+ <h2>Day Book</h2>
+ <div class="card">
+  <div class="formrow">
+   <div class="field"><label>From Date</label><input type="date" id="dayFrom" onchange="renderDaybook()"></div>
+   <div class="field"><label>To Date</label><input type="date" id="dayTo" onchange="renderDaybook()"></div>
+  </div>
+  <div class="table-wrap" id="daybookTable"></div>
+ </div>
 </section>
 
 <section id="ledger" class="page">
-<h1>Account Ledger</h1>
-<div class="panel">
-<div class="field"><label>Select Account</label><select id="ledgerAccount" onchange="renderLedger()"></select></div>
-<br>
-<div style="overflow:auto">
-<table>
-<thead><tr><th>Date</th><th>Voucher</th><th>Particulars</th><th>Debit</th><th>Credit</th><th>Balance</th></tr></thead>
-<tbody id="ledgerRows"></tbody>
-</table>
-</div>
-</div>
+ <h2>Account Ledger</h2>
+ <div class="card">
+  <div class="formrow">
+   <div class="field"><label>Select Account</label><select id="ledgerAccount" onchange="renderLedger()"></select></div>
+  </div>
+  <div class="table-wrap" id="ledgerTable"></div>
+ </div>
 </section>
 
 <section id="trial" class="page">
-<h1>Trial Balance</h1>
-<div class="panel">
-<table>
-<thead><tr><th>Account</th><th>Group</th><th>Debit</th><th>Credit</th></tr></thead>
-<tbody id="trialRows"></tbody>
-<tfoot id="trialFoot"></tfoot>
-</table>
-<div id="trialStatus" class="notice"></div>
-</div>
+ <h2>Trial Balance</h2>
+ <div class="card">
+  <div class="table-wrap" id="trialTable"></div>
+ </div>
 </section>
 
 <section id="pl" class="page">
-<h1>Profit & Loss Account</h1>
-<div class="two">
-<div class="panel"><h3>Expenses (Dr)</h3><div id="expenses"></div></div>
-<div class="panel"><h3>Income (Cr)</h3><div id="income"></div></div>
-</div>
-<div class="panel"><h3>Net Profit / Loss</h3><h2 id="netProfit">₹0.00</h2></div>
+ <h2>Profit & Loss Account</h2>
+ <div class="card">
+  <div class="table-wrap" id="plTable"></div>
+ </div>
 </section>
 
 <section id="balance" class="page">
-<h1>Balance Sheet</h1>
-<div class="two">
-<div class="panel"><h3>Liabilities & Capital</h3><div id="liabilities"></div></div>
-<div class="panel"><h3>Assets</h3><div id="assets"></div></div>
-</div>
-<div class="panel" id="bsStatus"></div>
+ <h2>Balance Sheet</h2>
+ <div class="card">
+  <div class="table-wrap" id="balanceTable"></div>
+ </div>
 </section>
 
 <section id="accounts" class="page">
-<h1>Chart of Accounts</h1>
-<div class="panel">
-<h3>Create New Ledger</h3>
-<div class="row">
-<div class="field"><label>Account Name</label><input id="accName" placeholder="Account Name"></div>
-<div class="field"><label>Account Group</label>
-<select id="accGroup">
-<option>Asset</option><option>Liability</option>
-<option>Capital</option><option>Income</option><option>Expense</option>
-</select></div>
-<div class="field"><label>Opening Balance</label><input id="opening" type="number" value="0"></div>
-<div class="field"><label>Opening Side</label><select id="openingSide"><option>Dr</option><option>Cr</option></select></div>
-</div>
-<button class="primary" onclick="addAccount()">Add Account</button>
-</div>
-<div class="panel">
-<table>
-<thead><tr><th>Account</th><th>Group</th><th>Opening Balance</th><th>Side</th><th>Action</th></tr></thead>
-<tbody id="accountRows"></tbody>
-</table>
-</div>
+ <h2>Chart of Accounts</h2>
+ <div class="card">
+  <h3>Add New Ledger Account</h3>
+  <div class="formrow">
+   <div class="field"><label>Account Name</label><input id="newAccount" placeholder="Account name"></div>
+   <div class="field"><label>Account Group</label>
+    <select id="newGroup">
+     <option value="Asset">Asset</option><option value="Liability">Liability</option>
+     <option value="Capital">Capital</option><option value="Income">Income</option>
+     <option value="Expense">Expense</option>
+    </select>
+   </div>
+   <div class="field"><label>Opening Balance</label><input type="number" id="newOpening" value="0"></div>
+   <div class="field"><label>Opening Balance Side</label>
+    <select id="newSide"><option>Dr</option><option>Cr</option></select>
+   </div>
+  </div>
+  <button onclick="addAccount()">Add Account</button>
+ </div>
+ <div class="card"><h3>Available Accounts</h3><div class="table-wrap" id="accountsTable"></div></div>
 </section>
 
-<section id="settings" class="page">
-<h1>Company & Backup</h1>
-<div class="panel">
-<div class="field"><label>Company Name</label><input id="company" value="My Company"></div><br>
-<button class="primary" onclick="saveCompany()">Save Company</button>
-</div>
-<div class="panel">
-<h3>Data Management</h3>
-<button class="green" onclick="backup()">Download JSON Backup</button>
-<label class="btn" for="restore">Restore JSON</label>
-<input id="restore" type="file" accept=".json" hidden onchange="restore(event)">
-<button onclick="exportCSV()">Export CSV</button>
-<button class="danger" onclick="clearData()">Clear All Data</button>
-</div>
+<section id="calculator" class="page">
+ <h2>Accounting Calculator</h2>
+ <div class="card" style="max-width:390px">
+  <div class="calculator">
+   <div class="calc-display" id="calcDisplay">0</div>
+   <div class="calc-grid">
+    <button class="clear" onclick="calcClear()">AC</button>
+    <button onclick="calcInput('%')">%</button>
+    <button onclick="calcBack()">⌫</button>
+    <button class="op" onclick="calcInput('/')">÷</button>
+    <button onclick="calcInput('7')">7</button><button onclick="calcInput('8')">8</button>
+    <button onclick="calcInput('9')">9</button><button class="op" onclick="calcInput('*')">×</button>
+    <button onclick="calcInput('4')">4</button><button onclick="calcInput('5')">5</button>
+    <button onclick="calcInput('6')">6</button><button class="op" onclick="calcInput('-')">−</button>
+    <button onclick="calcInput('1')">1</button><button onclick="calcInput('2')">2</button>
+    <button onclick="calcInput('3')">3</button><button class="op" onclick="calcInput('+')">+</button>
+    <button onclick="calcInput('0')">0</button><button onclick="calcInput('.')">.</button>
+    <button class="equal" style="grid-column:span 2" onclick="calcResult()">=</button>
+   </div>
+  </div>
+  <div class="actions">
+   <button onclick="copyCalc()">Copy Result</button>
+   <button class="secondary" onclick="useCalcInVoucher()">Use in Voucher</button>
+  </div>
+ </div>
 </section>
 
-</div>
+<section id="backup" class="page">
+ <h2>Backup & Export</h2>
+ <div class="card">
+  <h3>Export Accounting Reports</h3>
+  <p style="font-size:13px;color:#718096">Export the current accounting data and reports.</p>
+  <div class="actions">
+   <button onclick="exportPDF()">Export PDF</button>
+   <button class="success" onclick="exportExcel()">Export Excel (.xlsx)</button>
+   <button class="dark" onclick="exportWord()">Export Word (.doc)</button>
+  </div>
+ </div>
+ <div class="card">
+  <h3>Data Backup</h3>
+  <div class="actions">
+   <button onclick="backupData()">Download JSON Backup</button>
+   <button class="secondary" onclick="document.getElementById('restoreFile').click()">Restore Backup</button>
+   <input type="file" id="restoreFile" accept=".json" style="display:none" onchange="restoreData(event)">
+  </div>
+ </div>
+ <div class="card">
+  <h3>Important Information</h3>
+  <p style="font-size:13px;color:#718096">Data is stored in this browser using localStorage. Regularly download a backup. Clearing browser data may delete your accounting records.</p>
+  <button class="danger" onclick="clearAllData()">Delete All Accounting Data</button>
+ </div>
+</section>
+
 </main>
 </div>
 
+<footer>© Copyright 2026 SAFS ASSOCIATE. All Rights Reserved.</footer>
+
 <script>
-const KEY='safs_ca_books';
-const defaults=[
-['Cash in Hand','Asset'],['Cash at Bank','Asset'],['Bank Current Account','Asset'],
-['Petty Cash','Asset'],['Sundry Debtors','Asset'],['Bills Receivable','Asset'],
-['Stock in Hand','Asset'],['Furniture & Fixtures','Asset'],['Computer & Peripherals','Asset'],
-['Plant & Machinery','Asset'],['Land & Building','Asset'],['Input CGST','Asset'],
-['Input SGST','Asset'],['Input IGST','Asset'],['TDS Receivable','Asset'],
-['Capital Account','Capital'],['Drawings','Capital'],['Reserves & Surplus','Capital'],
-['Sundry Creditors','Liability'],['Bank Loan','Liability'],['Unsecured Loan','Liability'],
-['Outstanding Expenses','Liability'],['Salary Payable','Liability'],
-['Rent Payable','Liability'],['TDS Payable','Liability'],['Output CGST','Liability'],
-['Output SGST','Liability'],['Output IGST','Liability'],['GST Payable','Liability'],
-['Sales','Income'],['Sales Local','Income'],['Sales Interstate','Income'],
-['Service Income','Income'],['Commission Received','Income'],
-['Interest Received','Income'],['Discount Received','Income'],['Other Income','Income'],
-['Purchases','Expense'],['Wages','Expense'],['Salary','Expense'],
-['Rent','Expense'],['Electricity Charges','Expense'],['Telephone & Internet','Expense'],
-['Printing & Stationery','Expense'],['Travelling Expenses','Expense'],
-['Conveyance','Expense'],['Fuel Expenses','Expense'],['Vehicle Maintenance','Expense'],
-['Insurance','Expense'],['Audit Fees','Expense'],['Professional Fees','Expense'],
-['Legal Fees','Expense'],['Accounting Charges','Expense'],['Bank Charges','Expense'],
-['Interest on Loan','Expense'],['Depreciation','Expense'],['Repairs & Maintenance','Expense'],
-['Office Expenses','Expense'],['Advertisement','Expense'],['Commission Paid','Expense'],
-['Bad Debts','Expense'],['GST Late Fee','Expense'],['Penalty','Expense'],
-['Freight Inward','Expense'],['Carriage Inward','Expense'],['Discount Allowed','Expense'],
-['Income Tax','Expense']
+const KEY="safs_ca_accounting_v2";
+const money=n=>"₹"+Number(n||0).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2});
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const today=()=>new Date().toISOString().slice(0,10);
+
+const defaultAccounts=[
+ ["Cash in Hand","Asset"],["Bank Account","Asset"],["Sundry Debtors","Asset"],
+ ["Furniture","Asset"],["Computer & Equipment","Asset"],["Input CGST","Asset"],
+ ["Input SGST","Asset"],["Input IGST","Asset"],["Sundry Creditors","Liability"],
+ ["Output CGST","Liability"],["Output SGST","Liability"],["Output IGST","Liability"],
+ ["Capital Account","Capital"],["Drawings","Capital"],["Sales Account","Income"],
+ ["Service Income","Income"],["Interest Received","Income"],["Purchase Account","Expense"],
+ ["Salary","Expense"],["Rent","Expense"],["Electricity","Expense"],
+ ["Stationery","Expense"],["Internet Expenses","Expense"],["Travelling Expenses","Expense"],
+ ["Bank Charges","Expense"],["Depreciation","Expense"]
 ];
-let db;
-try{db=JSON.parse(localStorage.getItem(KEY))}catch(e){}
-if(!db||!Array.isArray(db.accounts)||!Array.isArray(db.vouchers)){
-db={company:'My Company',accounts:defaults.map(x=>({id:uid(),name:x[0],group:x[1],opening:0,side:['Liability','Capital','Income'].includes(x[1])?'Cr':'Dr'})),vouchers:[]};
+
+let data=loadData();
+function loadData(){
+ try{
+  const x=JSON.parse(localStorage.getItem(KEY));
+  if(x&&Array.isArray(x.accounts)&&Array.isArray(x.vouchers))return x;
+ }catch(e){}
+ return {accounts:defaultAccounts.map(a=>({id:uid(),name:a[0],group:a[1],opening:0,side:"Dr"})),vouchers:[]};
 }
-function uid(){return Math.random().toString(36).slice(2)+Date.now().toString(36)}
-function save(){localStorage.setItem(KEY,JSON.stringify(db));refresh()}
-function fmt(n){return '₹'+Number(n||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})}
-function safe(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function show(id,btn){
-document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
-document.getElementById(id).classList.add('active');
-document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));
-if(btn)btn.classList.add('active');
-document.getElementById('title').textContent=id==='pl'?'Profit & Loss Account':id==='bs'?'Balance Sheet':id==='dashboard'?'Accounting Dashboard':id==='voucher'?'Voucher Entry':id.toUpperCase();
-refresh();
+function persist(){localStorage.setItem(KEY,JSON.stringify(data));}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function accountOptions(){
+ return '<option value="">Select Account</option>'+data.accounts.map(a=>`<option value="${a.id}">${esc(a.name)}</option>`).join("");
 }
-function accountOptions(value=''){
-return '<option value="">Select Account</option>'+db.accounts.slice().sort((a,b)=>a.name.localeCompare(b.name)).map(a=>`<option value="${a.id}" ${a.id===value?'selected':''}>${safe(a.name)} (${a.group})</option>`).join('');
-}
-function addLine(side){
-let tr=document.createElement('tr');
-tr.innerHTML=`<td><select class="account">${accountOptions()}</select></td>
-<td><input class="dr num" type="number" min="0" step="0.01" placeholder="0.00"></td>
-<td><input class="cr num" type="number" min="0" step="0.01" placeholder="0.00"></td>
-<td class="no-print"><button class="danger">×</button></td>`;
-let dr=tr.querySelector('.dr'),cr=tr.querySelector('.cr');
-dr.addEventListener('input',()=>{if(+dr.value)cr.value='';totals()});
-cr.addEventListener('input',()=>{if(+cr.value)dr.value='';totals()});
-tr.querySelector('button').onclick=()=>{tr.remove();totals()};
-document.getElementById('entries').appendChild(tr);
-(side==='dr'?dr:cr).focus();
-}
-function totals(){
-let d=0,c=0;
-document.querySelectorAll('#entries tr').forEach(r=>{d+=Number(r.querySelector('.dr').value)||0;c+=Number(r.querySelector('.cr').value)||0});
-document.getElementById('totalDr').textContent=d.toFixed(2);
-document.getElementById('totalCr').textContent=c.toFixed(2);
-document.getElementById('balanceMsg').textContent=d>0&&Math.abs(d-c)<.005?'✓ Voucher Balanced':`Difference: ${fmt(Math.abs(d-c))}`;
-}
-function resetVoucher(){
-document.getElementById('entries').innerHTML='';
-document.getElementById('vdate').value=new Date().toISOString().slice(0,10);
-document.getElementById('vno').value='';
-document.getElementById('narration').value='';
-addLine('dr');addLine('cr');
-}
-function saveVoucher(){
-let rows=[...document.querySelectorAll('#entries tr')].map(r=>({
-account:r.querySelector('.account').value,
-dr:Number(r.querySelector('.dr').value)||0,
-cr:Number(r.querySelector('.cr').value)||0
-})).filter(r=>r.account&&(r.dr||r.cr));
-let d=rows.reduce((s,r)=>s+r.dr,0),c=rows.reduce((s,r)=>s+r.cr,0);
-if(rows.length<2)return alert('At least two account entries required.');
-if(rows.some(r=>r.dr>0&&r.cr>0))return alert('One row cannot have both Dr and Cr.');
-if(!d||Math.abs(d-c)>.004)return alert('Debit and Credit must be equal.');
-let no=document.getElementById('vno').value.trim()||'JV-'+String(db.vouchers.length+1).padStart(5,'0');
-if(db.vouchers.some(v=>v.no===no))return alert('Voucher number already exists.');
-db.vouchers.push({
-id:uid(),date:document.getElementById('vdate').value,
-no,type:document.getElementById('vtype').value,
-narration:document.getElementById('narration').value,
-rows
-});
-save();alert('Voucher saved successfully.');resetVoucher();show('daybook');
-}
-function balances(){
-let b={};db.accounts.forEach(a=>b[a.id]={dr:a.side==='Dr'?+a.opening:0,cr:a.side==='Cr'?+a.opening:0});
-db.vouchers.forEach(v=>v.rows.forEach(r=>{if(!b[r.account])return;b[r.account].dr+=r.dr;b[r.account].cr+=r.cr}));
-return b;
-}
-function linesFor(account){
-let out=[];
-db.vouchers.forEach(v=>v.rows.forEach(r=>{if(r.account===account)out.push({...r,date:v.date,no:v.no,narration:v.narration,type:v.type,vid:v.id})}));
-return out.sort((a,b)=>a.date.localeCompare(b.date));
-}
-function profit(){
-let b=balances(),income=0,expense=0;
-db.accounts.forEach(a=>{
-let x=b[a.id],net=x.cr-x.dr;
-if(a.group==='Income')income+=net;
-if(a.group==='Expense')expense-=net;
-});
-return {income,expense,net:income-expense};
-}
-function renderTrial(){
-let b=balances(),d=0,c=0;
-document.getElementById('trialRows').innerHTML=db.accounts.map(a=>{
-let n=b[a.id].dr-b[a.id].cr,dr=Math.max(n,0),cr=Math.max(-n,0);
-d+=dr;c+=cr;
-return dr||cr?`<tr><td>${safe(a.name)}</td><td>${a.group}</td><td class="num">${fmt(dr)}</td><td class="num">${fmt(cr)}</td></tr>`:'';
-}).join('');
-document.getElementById('trialFoot').innerHTML=`<tr class="total"><td colspan="2">TOTAL</td><td>${fmt(d)}</td><td>${fmt(c)}</td></tr>`;
-document.getElementById('trialStatus').textContent=Math.abs(d-c)<.005?'Trial Balance agrees ✓':'Difference: '+fmt(Math.abs(d-c));
-}
-function renderLedger(){
-let id=document.getElementById('ledgerAccount').value;
-let a=db.accounts.find(x=>x.id===id),run=0;
-if(!a){document.getElementById('ledgerRows').innerHTML='';return}
-let opening=a.side==='Dr'?+a.opening:-a.opening;
-run=opening;
-let html=`<tr><td>Opening</td><td>—</td><td>Opening Balance</td><td>${fmt(Math.max(opening,0))}</td><td>${fmt(Math.max(-opening,0))}</td><td>${fmt(Math.abs(run))} ${run>=0?'Dr':'Cr'}</td></tr>`;
-linesFor(id).forEach(r=>{
-run+=r.dr-r.cr;
-html+=`<tr><td>${r.date}</td><td>${safe(r.no)}</td><td>${safe(r.narration||r.type)}</td><td>${fmt(r.dr)}</td><td>${fmt(r.cr)}</td><td>${fmt(Math.abs(run))} ${run>=0?'Dr':'Cr'}</td></tr>`;
-});
-document.getElementById('ledgerRows').innerHTML=html;
-}
-function table(rows){
-return '<table><thead><tr><th>Account</th><th>Amount</th></tr></thead><tbody>'+rows.map(x=>`<tr><td>${safe(x.name)}</td><td>${fmt(x.amount)}</td></tr>`).join('')+'</tbody></table>';
-}
-function renderPL(){
-let b=balances(),ex=[],inc=[];
-db.accounts.forEach(a=>{
-let x=b[a.id];
-if(a.group==='Income'&&x.cr!==x.dr)inc.push({name:a.name,amount:x.cr-x.dr});
-if(a.group==='Expense'&&x.dr!==x.cr)ex.push({name:a.name,amount:x.dr-x.cr});
-});
-let p=profit();
-document.getElementById('expenses').innerHTML=table(ex);
-document.getElementById('income').innerHTML=table(inc);
-document.getElementById('netProfit').textContent=(p.net>=0?'Net Profit: ':'Net Loss: ')+fmt(Math.abs(p.net));
-}
-function renderBalance(){
-let b=balances(),assets=[],liabs=[],at=0,lt=0;
-db.accounts.forEach(a=>{
-let x=b[a.id],n=x.dr-x.cr;
-if(a.group==='Asset'&&n){assets.push({name:a.name,amount:n});at+=n}
-if(['Liability','Capital'].includes(a.group)&&n){liabs.push({name:a.name,amount:-n});lt-=n}
-});
-let p=profit();
-if(p.net){liabs.push({name:'Current Year Profit / Loss',amount:p.net});lt+=p.net}
-document.getElementById('assets').innerHTML=table(assets);
-document.getElementById('liabilities').innerHTML=table(liabs);
-document.getElementById('bsStatus').textContent=Math.abs(at-lt)<.01?'Balance Sheet agrees ✓':'Difference: '+fmt(Math.abs(at-lt));
-}
-function renderAccounts(){
-document.getElementById('accountRows').innerHTML=db.accounts.map(a=>`<tr><td>${safe(a.name)}</td><td>${a.group}</td><td>${fmt(a.opening)}</td><td>${a.side}</td><td><button onclick="deleteAccount('${a.id}')">Delete</button></td></tr>`).join('');
-document.getElementById('ledgerAccount').innerHTML=accountOptions(document.getElementById('ledgerAccount').value);
-}
-function addAccount(){
-let name=document.getElementById('accName').value.trim();
-if(!name)return alert('Enter account name.');
-if(db.accounts.some(a=>a.name.toLowerCase()===name.toLowerCase()))return alert('Account already exists.');
-db.accounts.push({id:uid(),name,group:document.getElementById('accGroup').value,opening:Number(document.getElementById('opening').value)||0,side:document.getElementById('openingSide').value});
-document.getElementById('accName').value='';
-save();
-}
-function deleteAccount(id){
-if(db.vouchers.some(v=>v.rows.some(r=>r.account===id)))return alert('Account is already used in vouchers.');
-if(!confirm('Delete this account?'))return;
-db.accounts=db.accounts.filter(a=>a.id!==id);save();
-}
-function renderDay(){
-document.getElementById('dayRows').innerHTML=db.vouchers.slice().reverse().map(v=>`<tr><td>${v.date}</td><td>${safe(v.no)}</td><td>${v.type}</td><td>${safe(v.narration)}</td><td>${fmt(v.rows.reduce((s,r)=>s+r.dr,0))}</td><td><button onclick="deleteVoucher('${v.id}')">Delete</button></td></tr>`).join('');
-}
-function deleteVoucher(id){
-if(!confirm('Delete voucher?'))return;
-db.vouchers=db.vouchers.filter(v=>v.id!==id);save();
+function account(id){return data.accounts.find(a=>a.id===id);}
+function showPage(id,btn){
+ document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+ document.getElementById(id).classList.add("active");
+ document.querySelectorAll(".nav").forEach(b=>b.classList.remove("active"));
+ if(btn)btn.classList.add("active");
+ refresh();
 }
 function refresh(){
-document.getElementById('company').value=db.company||'My Company';
-document.getElementById('dashCount').textContent=db.vouchers.length;
-let b=balances(),d=0,c=0;
-Object.values(b).forEach(x=>{d+=x.dr;c+=x.cr});
-document.getElementById('dashDr').textContent=fmt(d);
-document.getElementById('dashCr').textContent=fmt(c);
-document.getElementById('dashProfit').textContent=fmt(profit().net);
-document.getElementById('recent').innerHTML=db.vouchers.slice(-5).reverse().map(v=>`<tr><td>${v.date}</td><td>${safe(v.no)}</td><td>${v.type}</td><td>${fmt(v.rows.reduce((s,r)=>s+r.dr,0))}</td></tr>`).join('');
-renderAccounts();renderDay();renderTrial();renderLedger();renderPL();renderBalance();
+ renderDashboard();renderDaybook();renderLedger();renderTrial();
+ renderPL();renderBalance();renderAccounts();updateLedgerSelect();
 }
-function saveCompany(){db.company=document.getElementById('company').value.trim()||'My Company';save();alert('Company saved.')}
-function backup(){download(JSON.stringify(db,null,2),'SAFS_Accounting_Backup.json','application/json')}
-function restore(e){
-let f=e.target.files[0];if(!f)return;
-let r=new FileReader();
-r.onload=()=>{try{let x=JSON.parse(r.result);if(!Array.isArray(x.accounts)||!Array.isArray(x.vouchers))throw 0;if(!confirm('Replace current data with backup?'))return;db=x;save();alert('Backup restored.')}catch(err){alert('Invalid backup file.')}};
-r.readAsText(f);
+function addVoucherLine(){
+ const div=document.createElement("div");
+ div.className="line-row";
+ div.innerHTML=`
+ <select class="drAccount" onchange="calcVoucherTotals()">${accountOptions()}</select>
+ <select class="crAccount" onchange="calcVoucherTotals()">${accountOptions()}</select>
+ <input class="lineAmount" type="text" inputmode="decimal" placeholder="Amount / formula" oninput="calcVoucherTotals()" onblur="formatAmount(this)">
+ <span class="drTotal">0.00</span><span class="crTotal">0.00</span>
+ <button class="danger" onclick="this.parentElement.remove();calcVoucherTotals()">×</button>`;
+ document.getElementById("voucherLines").appendChild(div);
 }
-function exportCSV(){
-let rows=[['Date','Voucher','Type','Account','Group','Debit','Credit']];
-db.vouchers.forEach(v=>v.rows.forEach(r=>{let a=db.accounts.find(x=>x.id===r.account);rows.push([v.date,v.no,v.type,a?.name||'',a?.group||'',r.dr,r.cr])}));
-let csv=rows.map(r=>r.map(x=>'"'+String(x??'').replace(/"/g,'""')+'"').join(',')).join('\n');
-download(csv,'SAFS_Vouchers.csv','text/csv');
+function numericInput(el){
+ let v=el.value.trim();
+ if(!v)return 0;
+ try{
+  if(!/^[0-9+\-*/().%\s]+$/.test(v))return NaN;
+  v=v.replace(/(\d+(?:\.\d+)?)%/g,"($1/100)");
+  let result=Function('"use strict";return ('+v+')')();
+  return Number.isFinite(result)&&result>=0?result:NaN;
+ }catch(e){return NaN;}
 }
-function download(data,name,type){
-let a=document.createElement('a'),url=URL.createObjectURL(new Blob([data],{type}));
-a.href=url;a.download=name;a.click();URL.revokeObjectURL(url);
+function formatAmount(el){
+ const n=numericInput(el);
+ if(Number.isFinite(n))el.value=n.toFixed(2);
 }
-function clearData(){
-if(!confirm('Permanently delete all vouchers and accounts? Download backup first.'))return;
-localStorage.removeItem(KEY);location.reload();
+function calcVoucherTotals(){
+ let dr=0,cr=0,valid=true;
+ document.querySelectorAll("#voucherLines .line-row").forEach(row=>{
+  const amount=numericInput(row.querySelector(".lineAmount"));
+  const d=row.querySelector(".drAccount").value;
+  const c=row.querySelector(".crAccount").value;
+  if(!Number.isFinite(amount)){valid=false;return;}
+  if(d)dr+=amount;
+  if(c)cr+=amount;
+  row.querySelector(".drTotal").textContent=d?amount.toFixed(2):"0.00";
+  row.querySelector(".crTotal").textContent=c?amount.toFixed(2):"0.00";
+ });
+ const diff=dr-cr;
+ document.getElementById("voucherTotal").textContent=
+ `Debit: ${money(dr)} | Credit: ${money(cr)} | Difference: ${money(Math.abs(diff))} ${valid?"":"| Invalid amount"}`;
+ document.getElementById("voucherTotal").style.color=valid&&Math.abs(diff)<.005?"#13875b":"#c43e48";
+ return {dr,cr,diff,valid};
 }
-window.show=show;window.addLine=addLine;window.saveVoucher=saveVoucher;window.resetVoucher=resetVoucher;window.addAccount=addAccount;window.deleteAccount=deleteAccount;window.deleteVoucher=deleteVoucher;window.backup=backup;window.restore=restore;window.exportCSV=exportCSV;window.saveCompany=saveCompany;window.clearData=clearData;
-document.getElementById('vdate').value=new Date().toISOString().slice(0,10);
-resetVoucher();refresh();
+function resetVoucher(){
+ document.getElementById("voucherLines").innerHTML="";
+ document.getElementById("vNarration").value="";
+ document.getElementById("vDate").value=today();
+ document.getElementById("vNumber").value="V-"+String(data.vouchers.length+1).padStart(4,"0");
+ addVoucherLine();calcVoucherTotals();
+}
+function saveVoucher(){
+ const totals=calcVoucherTotals();
+ if(!totals.valid){alert("Please enter valid amounts.");return;}
+ if(Math.abs(totals.diff)>.005||totals.dr===0){alert("Debit aur Credit total equal hona chahiye.");return;}
+ const entries=[];
+ let invalid=false;
+ document.querySelectorAll("#voucherLines .line-row").forEach(row=>{
+  const d=row.querySelector(".drAccount").value;
+  const c=row.querySelector(".crAccount").value;
+  const amount=numericInput(row.querySelector(".lineAmount"));
+  if(!d&&!c)return;
+  if(!Number.isFinite(amount)||amount<=0||(!d&&!c)|| (d&&c&&d===c)){invalid=true;return;}
+  if(d)entries.push({accountId:d,side:"Dr",amount});
+  if(c)entries.push({accountId:c,side:"Cr",amount});
+ });
+ if(invalid||!entries.length){alert("Har entry mein valid account aur amount select karein.");return;}
+ const v={
+  id:uid(),number:document.getElementById("vNumber").value,
+  date:document.getElementById("vDate").value||today(),
+  type:document.getElementById("vType").value,
+  narration:document.getElementById("vNarration").value,
+  entries
+ };
+ data.vouchers.push(v);persist();alert("Voucher successfully saved.");
+ resetVoucher();refresh();
+}
+function renderDashboard(){
+ const dr=data.vouchers.reduce((s,v)=>s+v.entries.filter(e=>e.side==="Dr").reduce((a,e)=>a+e.amount,0),0);
+ const cr=data.vouchers.reduce((s,v)=>s+v.entries.filter(e=>e.side==="Cr").reduce((a,e)=>a+e.amount,0),0);
+ document.getElementById("dVouchers").textContent=data.vouchers.length;
+ document.getElementById("dDebit").textContent=money(dr);
+ document.getElementById("dCredit").textContent=money(cr);
+ document.getElementById("dDifference").textContent=money(Math.abs(dr-cr));
+ const recent=[...data.vouchers].reverse().slice(0,6);
+ document.getElementById("recentTable").innerHTML=table(["Date","Voucher","Type","Narration","Amount"],recent.map(v=>[
+ v.date,v.number,v.type,v.narration,money(v.entries.filter(e=>e.side==="Dr").reduce((s,e)=>s+e.amount,0))
+ ]));
+}
+function table(headers,rows){
+ if(!rows.length)return "<p style='color:#718096;font-size:13px'>No records available.</p>";
+ return `<table><thead><tr>${headers.map(h=>`<th>${esc(h)}</th>`).join("")}</tr></thead><tbody>${
+ rows.map(r=>`<tr>${r.map(c=>`<td>${c??""}</td>`).join("")}</tr>`).join("")
+ }</tbody></table>`;
+}
+function renderDaybook(){
+ const from=document.getElementById("dayFrom")?.value||"";
+ const to=document.getElementById("dayTo")?.value||"";
+ const list=data.vouchers.filter(v=>(!from||v.date>=from)&&(!to||v.date<=to));
+ document.getElementById("daybookTable").innerHTML=table(
+ ["Date","Voucher No.","Type","Narration","Debit","Credit","Action"],
+ list.map(v=>{
+  const dr=v.entries.filter(e=>e.side==="Dr").reduce((s,e)=>s+e.amount,0);
+  const cr=v.entries.filter(e=>e.side==="Cr").reduce((s,e)=>s+e.amount,0);
+  return [v.date,esc(v.number),esc(v.type),esc(v.narration),money(dr),money(cr),
+  `<button class="danger" onclick="deleteVoucher('${v.id}')">Delete</button>`];
+ }));
+}
+function deleteVoucher(id){
+ if(!confirm("Delete this voucher?"))return;
+ data.vouchers=data.vouchers.filter(v=>v.id!==id);persist();refresh();
+}
+function updateLedgerSelect(){
+ const el=document.getElementById("ledgerAccount");
+ if(!el)return;
+ const old=el.value;
+ el.innerHTML=accountOptions();
+ if(account(old))el.value=old;
+}
+function getAccountTotals(id){
+ let dr=0,cr=0;
+ data.vouchers.forEach(v=>v.entries.filter(e=>e.accountId===id).forEach(e=>{
+  if(e.side==="Dr")dr+=e.amount;else cr+=e.amount;
+ }));
+ return {dr,cr};
+}
+function renderLedger(){
+ const id=document.getElementById("ledgerAccount")?.value;
+ if(!id)return;
+ const a=account(id);if(!a)return;
+ const opening=Number(a.opening||0)*(a.side==="Dr"?1:-1);
+ let running=opening;
+ const rows=[];
+ rows.push(["-","Opening Balance",a.side==="Dr"?money(Math.abs(opening)):"-",a.side==="Cr"?money(Math.abs(opening)):"-",money(Math.abs(opening))+" "+(running>=0?"Dr":"Cr")]);
+ const tx=[];
+ data.vouchers.forEach(v=>v.entries.filter(e=>e.accountId===id).forEach(e=>tx.push({date:v.date,number:v.number,narration:v.narration,side:e.side,amount:e.amount})));
+ tx.sort((a,b)=>a.date.localeCompare(b.date));
+ tx.forEach(e=>{
+  running+=e.side==="Dr"?e.amount:-e.amount;
+  rows.push([e.date,esc(e.number+" "+e.narration),e.side==="Dr"?money(e.amount):"-",e.side==="Cr"?money(e.amount):"-",money(Math.abs(running))+" "+(running>=0?"Dr":"Cr")]);
+ });
+ document.getElementById("ledgerTable").innerHTML=table(["Date","Particulars","Debit","Credit","Balance"],rows);
+}
+function renderTrial(){
+ const rows=data.accounts.map(a=>{
+  const t=getAccountTotals(a.id);
+  let net=(a.side==="Dr"?Number(a.opening||0):-Number(a.opening||0))+t.dr-t.cr;
+  return [esc(a.name),net>0?money(net):"-",net<0?money(-net):"-"];
+ });
+ const totalDr=data.accounts.reduce((s,a)=>{let t=getAccountTotals(a.id);return s+Math.max(0,(a.side==="Dr"?Number(a.opening||0):-Number(a.opening||0))+t.dr-t.cr)},0);
+ const totalCr=data.accounts.reduce((s,a)=>{let t=getAccountTotals(a.id);return s+Math.max(0,-((a.side==="Dr"?Number(a.opening||0):-Number(a.opening||0))+t.dr-t.cr))},0);
+ rows.push(["TOTAL",money(totalDr),money(totalCr)]);
+ document.getElementById("trialTable").innerHTML=table(["Account","Debit Balance","Credit Balance"],rows);
+}
+function accountNet(a){
+ const t=getAccountTotals(a.id);
+ return (a.side==="Dr"?Number(a.opening||0):-Number(a.opening||0))+t.dr-t.cr;
+}
+function renderPL(){
+ const income=data.accounts.filter(a=>a.group==="Income");
+ const expenses=data.accounts.filter(a=>a.group==="Expense");
+ const inc=income.reduce((s,a)=>s-accountNet(a),0);
+ const exp=expenses.reduce((s,a)=>s+accountNet(a),0);
+ const rows=[
+ ...income.map(a=>[esc(a.name),money(Math.max(0,-accountNet(a)))]),
+ ["TOTAL INCOME",money(inc)],
+ ...expenses.map(a=>[esc(a.name),money(Math.max(0,accountNet(a)))]),
+ ["TOTAL EXPENSES",money(exp)],
+ ["NET PROFIT / (LOSS)",money(inc-exp)]
+ ];
+ document.getElementById("plTable").innerHTML=table(["Particulars","Amount"],rows);
+}
+function renderBalance(){
+ const groups=["Asset","Liability","Capital"];
+ const rows=[];
+ groups.forEach(g=>{
+  rows.push([`<b>${g.toUpperCase()}</b>`,""]);
+  data.accounts.filter(a=>a.group===g).forEach(a=>{
+   let n=accountNet(a);
+   rows.push([esc(a.name),money(Math.abs(n))+" "+(n>=0?"Dr":"Cr")]);
+  });
+ });
+ const inc=data.accounts.filter(a=>a.group==="Income").reduce((s,a)=>s-accountNet(a),0);
+ const exp=data.accounts.filter(a=>a.group==="Expense").reduce((s,a)=>s+accountNet(a),0);
+ rows.push(["Current Period Profit / (Loss)",money(inc-exp)]);
+ document.getElementById("balanceTable").innerHTML=table(["Particulars","Balance"],rows);
+}
+function renderAccounts(){
+ document.getElementById("accountsTable").innerHTML=table(
+ ["Account Name","Group","Opening Balance","Side"],
+ data.accounts.map(a=>[esc(a.name),a.group,money(a.opening),a.side])
+ );
+}
+function addAccount(){
+ const name=document.getElementById("newAccount").value.trim();
+ if(!name){alert("Enter account name.");return;}
+ if(data.accounts.some(a=>a.name.toLowerCase()===name.toLowerCase())){alert("Account already exists.");return;}
+ const opening=Number(document.getElementById("newOpening").value)||0;
+ if(opening<0){alert("Opening balance cannot be negative.");return;}
+ data.accounts.push({id:uid(),name,group:document.getElementById("newGroup").value,opening,side:document.getElementById("newSide").value});
+ document.getElementById("newAccount").value="";
+ document.getElementById("newOpening").value="0";
+ persist();refresh();
+}
+let calcValue="0";
+function calcInput(x){
+ if(calcValue==="0"&&/[0-9.]/.test(x))calcValue=x;
+ else calcValue+=x;
+ document.getElementById("calcDisplay").textContent=calcValue;
+}
+function calcClear(){calcValue="0";document.getElementById("calcDisplay").textContent="0";}
+function calcBack(){calcValue=calcValue.slice(0,-1)||"0";document.getElementById("calcDisplay").textContent=calcValue;}
+function calcResult(){
+ try{
+  let exp=calcValue.replace(/(\d+(?:\.\d+)?)%/g,"($1/100)");
+  if(!/^[0-9+\-*/().\s]+$/.test(exp))throw Error();
+  const r=Function('"use strict";return ('+exp+')')();
+  if(!Number.isFinite(r))throw Error();
+  calcValue=String(Number(r.toFixed(8)));
+  document.getElementById("calcDisplay").textContent=calcValue;
+ }catch(e){document.getElementById("calcDisplay").textContent="Invalid";calcValue="0";}
+}
+function copyCalc(){
+ calcResult();navigator.clipboard?.writeText(calcValue).then(()=>alert("Result copied."));
+}
+function openCalc(){showPage("calculator",document.querySelectorAll(".nav")[8]);}
+function useCalcInVoucher(){
+ calcResult();
+ const active=document.querySelector("#voucherLines .lineAmount");
+ if(active){active.value=calcValue;calcVoucherTotals();}
+ else{alert("Voucher mein amount field available nahi hai.");}
+}
+function exportRows(){
+ const rows=[["Date","Voucher No","Type","Narration","Account","Debit","Credit"]];
+ data.vouchers.forEach(v=>v.entries.forEach(e=>{
+  rows.push([v.date,v.number,v.type,v.narration,account(e.accountId)?.name||"Unknown",e.side==="Dr"?e.amount:0,e.side==="Cr"?e.amount:0]);
+ }));
+ return rows;
+}
+function exportExcel(){
+ if(!window.XLSX){alert("Excel library load nahi hui. Internet check karein.");return;}
+ const wb=XLSX.utils.book_new();
+ XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(exportRows()),"Transactions");
+ XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([["Account","Group","Opening","Side"],...data.accounts.map(a=>[a.name,a.group,a.opening,a.side])]),"Accounts");
+ XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([["Account","Debit","Credit"],...data.accounts.map(a=>{let n=accountNet(a);return [a.name,Math.max(0,n),Math.max(0,-n)]})]),"Trial Balance");
+ XLSX.writeFile(wb,"SAFS-Accounting-Report.xlsx");
+}
+function exportPDF(){
+ if(!window.jspdf){alert("PDF library load nahi hui. Internet check karein.");return;}
+ const {jsPDF}=window.jspdf;const doc=new jsPDF();
+ doc.setFontSize(17);doc.text("SAFS ASSOCIATE",14,17);
+ doc.setFontSize(10);doc.text("Professional CA Accounting Report",14,24);
+ doc.autoTable({startY:31,head:[exportRows()[0]],body:exportRows().slice(1)});
+ doc.save("SAFS-Accounting-Report.pdf");
+}
+function exportWord(){
+ const rows=exportRows();
+ const html=`<html><head><meta charset="utf-8"></head><body>
+ <h1>SAFS ASSOCIATE</h1><h3>Professional CA Accounting Report</h3>
+ <table border="1" cellspacing="0" cellpadding="6">
+ ${rows.map((r,i)=>"<tr>"+r.map(c=>`<${i===0?"th":"td"}>${esc(c)}</${i===0?"th":"td"}>`).join("")+"</tr>").join("")}
+ </table><p>© Copyright 2026 SAFS ASSOCIATE</p></body></html>`;
+ const blob=new Blob(["\ufeff",html],{type:"application/msword"});
+ downloadBlob(blob,"SAFS-Accounting-Report.doc");
+}
+function downloadBlob(blob,name){
+ const url=URL.createObjectURL(blob);const a=document.createElement("a");
+ a.href=url;a.download=name;a.click();URL.revokeObjectURL(url);
+}
+function backupData(){
+ downloadBlob(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),"SAFS-Accounting-Backup.json");
+}
+function restoreData(event){
+ const file=event.target.files[0];if(!file)return;
+ const reader=new FileReader();
+ reader.onload=()=>{
+  try{
+   const x=JSON.parse(reader.result);
+   if(!Array.isArray(x.accounts)||!Array.isArray(x.vouchers))throw Error();
+   if(!confirm("Current data replace ho jayega. Continue?"))return;
+   data=x;persist();refresh();alert("Backup restored.");
+  }catch(e){alert("Invalid backup file.");}
+ };
+ reader.readAsText(file);
+ event.target.value="";
+}
+function clearAllData(){
+ if(!confirm("WARNING: All vouchers and accounts will be deleted. Continue?"))return;
+ localStorage.removeItem(KEY);
+ data=loadData();persist();resetVoucher();refresh();
+}
+document.getElementById("vDate").value=today();
+document.getElementById("vNumber").value="V-"+String(data.vouchers.length+1).padStart(4,"0");
+addVoucherLine();persist();refresh();
 </script>
 </body>
 </html>
