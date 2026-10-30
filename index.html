@@ -4,633 +4,445 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SAFS ASSOCIATE | CA Accounting Suite</title>
-
-<!-- Export Libraries -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
+<title>SAFS ASSOCIATE - Accounting Software</title>
 <style>
-:root{
- --navy:#101d35;--blue:#2456a6;--light:#f3f6fb;
- --white:#fff;--text:#26354a;--muted:#718096;
- --green:#13875b;--red:#d64545;--border:#e1e7ef;
+:root {
+  --bg:#101722; --panel:#192536; --panel2:#202f43;
+  --text:#edf3fa; --muted:#9aabc0; --accent:#39a5ff;
+  --green:#20bd83; --red:#ed6875; --border:#304158;
 }
 *{box-sizing:border-box}
-body{margin:0;background:var(--light);font-family:Arial,sans-serif;color:var(--text)}
-header{
- background:linear-gradient(110deg,#101d35,#2456a6);
- color:white;padding:17px 24px;display:flex;
- justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap;
-}
-.brand{font-size:22px;font-weight:800;letter-spacing:1px}
-.brand small{display:block;font-size:11px;font-weight:400;letter-spacing:2px;margin-top:5px;color:#d6e2f8}
-.header-right{font-size:12px;color:#e5edff}
-.layout{display:flex;min-height:calc(100vh - 75px)}
-.sidebar{
- width:235px;background:var(--navy);color:white;padding:18px 12px;
- flex-shrink:0;
-}
-.sidebar h4{color:#91a9cf;font-size:11px;padding-left:12px;letter-spacing:1px}
-.nav{
- display:block;width:100%;border:0;background:transparent;color:#dce6f7;
- text-align:left;padding:12px;border-radius:7px;margin:3px 0;
- cursor:pointer;font-size:13px;
-}
-.nav:hover,.nav.active{background:#294b7b;color:white}
-.main{flex:1;padding:24px;min-width:0}
-.page{display:none}.page.active{display:block}
-h2{font-size:22px;margin:0 0 18px;color:#172b4d}
-h3{font-size:15px;margin:0 0 15px}
-.card{
- background:white;border:1px solid var(--border);border-radius:11px;
- padding:18px;margin-bottom:18px;box-shadow:0 3px 12px #162b4d08;
-}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px}
-.stat{background:white;padding:19px;border-radius:10px;border:1px solid var(--border)}
-.stat small{color:var(--muted);font-size:12px}
-.stat strong{display:block;font-size:23px;margin-top:9px;color:#1b3d70}
-input,select,textarea{
- padding:10px;border:1px solid #d7dfeb;border-radius:6px;
- width:100%;font-size:13px;background:white;color:var(--text);
-}
-label{font-size:12px;font-weight:bold;display:block;margin-bottom:6px}
-.field{min-width:140px;flex:1}
-.formrow{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px}
-button{
- cursor:pointer;border:0;border-radius:6px;padding:10px 14px;
- font-size:12px;font-weight:bold;background:var(--blue);color:white;
-}
+body{margin:0;background:var(--bg);color:var(--text);
+font-family:Arial,sans-serif}
+header{background:#111d2c;border-bottom:1px solid var(--border);
+padding:14px 22px;display:flex;align-items:center;gap:14px}
+header img{width:48px;height:48px;object-fit:contain}
+header h2{margin:0;font-size:20px}
+header small{color:var(--muted)}
+.app{display:grid;grid-template-columns:250px 1fr;min-height:calc(100vh - 77px)}
+aside{background:#142031;padding:18px;border-right:1px solid var(--border)}
+main{padding:22px;min-width:0}
+input,select,button,textarea{font:inherit}
+input,select,textarea{background:#101a28;color:var(--text);
+border:1px solid var(--border);padding:11px;border-radius:7px;width:100%}
+button{background:var(--accent);border:0;color:white;padding:10px 14px;
+border-radius:7px;cursor:pointer;font-weight:600}
 button:hover{filter:brightness(1.1)}
-.secondary{background:#e9eff8;color:#24436f}
-.success{background:var(--green)}
-.danger{background:var(--red)}
-.dark{background:#172b4d}
-table{width:100%;border-collapse:collapse;font-size:12px;min-width:650px}
-th{background:#edf2f9;color:#314867;text-align:left}
-td,th{padding:11px 9px;border-bottom:1px solid var(--border)}
-.table-wrap{overflow-x:auto}
-.right{text-align:right}
-.green{color:var(--green)}.red{color:var(--red)}
-.actions{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
-.line-row{
- display:grid;grid-template-columns:1fr 1fr 130px 85px 85px 45px;
- gap:8px;margin-bottom:9px;align-items:center;
+button.secondary{background:var(--panel2);border:1px solid var(--border)}
+button.danger{background:#a83d4c}
+button.green{background:#16885f}
+.nav{display:block;width:100%;text-align:left;margin:7px 0;background:transparent;
+color:var(--text);border:1px solid transparent}
+.nav.active,.nav:hover{background:var(--panel2);border-color:var(--border)}
+.card{background:var(--panel);border:1px solid var(--border);
+border-radius:12px;padding:17px;margin-bottom:16px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.row>*{flex:1}
+.row .fixed{flex:0 0 auto}
+h1{font-size:24px;margin:0 0 18px}
+h3{margin:0 0 14px}
+.muted{color:var(--muted)}
+.small{font-size:12px}
+.client-list{margin-top:15px}
+.client-item{padding:12px;border:1px solid var(--border);
+border-radius:8px;margin:8px 0;cursor:pointer}
+.client-item.active{border-color:var(--accent);background:#1c3048}
+.year-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+.year-tab{background:var(--panel2);border:1px solid var(--border)}
+.year-tab.active{background:var(--accent);border-color:var(--accent)}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(130px,1fr));gap:12px}
+.stat{background:var(--panel2);padding:15px;border-radius:9px}
+.stat strong{display:block;font-size:21px;margin-top:8px}
+table{width:100%;border-collapse:collapse;min-width:600px}
+th,td{padding:11px;border-bottom:1px solid var(--border);text-align:left}
+th{color:#b9c9dc;background:#202f43}
+.table-wrap{overflow:auto}
+.hidden{display:none!important}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+label{font-size:13px;color:var(--muted);display:block;margin-bottom:6px}
+.field{min-width:0}
+footer{text-align:center;color:var(--muted);padding:20px;font-size:12px}
+@media(max-width:800px){
+.app{grid-template-columns:1fr}
+aside{border-right:0;border-bottom:1px solid var(--border)}
+.stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+main{padding:14px}
 }
-.line-head{font-size:11px;color:var(--muted);font-weight:bold;margin-bottom:8px}
-.balance{font-size:13px;font-weight:bold;padding:12px;background:#f1f5fb;border-radius:7px}
-.calculator{background:#172b4d;padding:14px;border-radius:10px;color:white}
-.calc-display{background:#fff;color:#142644;text-align:right;font-size:23px;padding:13px;border-radius:6px;margin-bottom:10px;min-height:52px;overflow:hidden}
-.calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
-.calc-grid button{padding:13px 4px;background:#314e79}
-.calc-grid button.op{background:#d5e4ff;color:#17345e}
-.calc-grid button.equal{background:#13875b}
-.calc-grid button.clear{background:#b83c48}
-footer{text-align:center;background:#101d35;color:#dce6f7;padding:16px;font-size:12px}
-@media(max-width:760px){
- .layout{display:block}.sidebar{width:100%;display:flex;overflow-x:auto;padding:8px}
- .sidebar h4{display:none}.nav{white-space:nowrap;width:auto}
- .main{padding:13px}.line-row{grid-template-columns:1fr 1fr}
- header{padding:14px}
-}
+@media(max-width:500px){.form-grid{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}}
 </style>
 </head>
-
 <body>
 <header>
- <div class="brand">SAFS ASSOCIATE
-  <small>PROFESSIONAL CA ACCOUNTING SUITE</small>
- </div>
- <div class="header-right">Accounting Management System | 2026</div>
+  <img src="./safs.png" alt="SAFS Logo" onerror="this.style.display='none'">
+  <div>
+    <h2>SAFS ASSOCIATE</h2>
+    <small>Professional Accounting & Client Management</small>
+  </div>
 </header>
 
-<div class="layout">
-<aside class="sidebar">
- <h4>ACCOUNTING MENU</h4>
- <button class="nav active" onclick="showPage('dashboard',this)">▦ Dashboard</button>
- <button class="nav" onclick="showPage('voucher',this)">＋ Voucher Entry</button>
- <button class="nav" onclick="showPage('daybook',this)">▤ Day Book</button>
- <button class="nav" onclick="showPage('ledger',this)">▥ Account Ledger</button>
- <button class="nav" onclick="showPage('trial',this)">▤ Trial Balance</button>
- <button class="nav" onclick="showPage('pl',this)">↗ Profit & Loss</button>
- <button class="nav" onclick="showPage('balance',this)">▣ Balance Sheet</button>
- <button class="nav" onclick="showPage('accounts',this)">☷ Chart of Accounts</button>
- <button class="nav" onclick="showPage('calculator',this)">⊞ Calculator</button>
- <button class="nav" onclick="showPage('backup',this)">⇩ Backup & Export</button>
+<div class="app">
+<aside>
+  <h3>Client Management</h3>
+  <input id="searchClient" placeholder="Search client name..." oninput="renderClients()">
+  <div class="client-list" id="clientList"></div>
+  <button style="width:100%;margin-top:12px" onclick="showNewClient()">+ Add New Client</button>
+  <hr style="border-color:var(--border);margin:20px 0">
+  <button class="nav active" onclick="showPage('dashboard',this)">▦ Dashboard</button>
+  <button class="nav" onclick="showPage('entries',this)">＋ Voucher Entry</button>
+  <button class="nav" onclick="showPage('reports',this)">▤ Reports</button>
+  <button class="nav" onclick="showPage('compare',this)">⇄ Year Comparison</button>
+  <button class="nav" onclick="showPage('backup',this)">⬇ Backup / Restore</button>
 </aside>
 
-<main class="main">
-
-<section id="dashboard" class="page active">
- <h2>Dashboard</h2>
- <div class="cards">
-  <div class="stat"><small>Total Vouchers</small><strong id="dVouchers">0</strong></div>
-  <div class="stat"><small>Total Debit</small><strong id="dDebit">₹0.00</strong></div>
-  <div class="stat"><small>Total Credit</small><strong id="dCredit">₹0.00</strong></div>
-  <div class="stat"><small>Difference</small><strong id="dDifference">₹0.00</strong></div>
- </div>
- <div class="card" style="margin-top:20px">
-  <h3>Recent Transactions</h3>
-  <div class="table-wrap" id="recentTable"></div>
- </div>
- <div class="card">
-  <h3>Accounting Information</h3>
-  <p style="font-size:13px;color:#718096">Enter balanced vouchers to automatically update your Day Book, Ledger, Trial Balance, Profit & Loss and Balance Sheet.</p>
- </div>
-</section>
-
-<section id="voucher" class="page">
- <h2>Voucher Entry</h2>
- <div class="card">
-  <div class="formrow">
-   <div class="field"><label>Voucher Type</label>
-    <select id="vType">
-     <option>Journal</option><option>Payment</option><option>Receipt</option>
-     <option>Contra</option><option>Purchase</option><option>Sales</option>
-    </select>
-   </div>
-   <div class="field"><label>Voucher Date</label><input type="date" id="vDate"></div>
-   <div class="field"><label>Voucher Number</label><input id="vNumber" readonly></div>
+<main>
+  <div id="noClient" class="card">
+    <h1>Welcome to SAFS ASSOCIATE</h1>
+    <p class="muted">Pehle naya client add karein ya left side se saved client search karke select karein.</p>
+    <button onclick="showNewClient()">+ Create First Client</button>
   </div>
-  <div class="field" style="margin-bottom:15px"><label>Narration / Description</label><input id="vNarration" placeholder="Enter transaction details"></div>
 
-  <h3>Debit / Credit Entries</h3>
-  <div class="line-row line-head">
-   <div>Debit Account</div><div>Credit Account</div><div>Amount</div><div>Dr Total</div><div>Cr Total</div><div></div>
-  </div>
-  <div id="voucherLines"></div>
-  <div class="actions">
-   <button class="secondary" onclick="addVoucherLine()">＋ Add Line</button>
-   <button class="secondary" onclick="openCalc()">⊞ Calculator</button>
-  </div>
-  <div class="balance" id="voucherTotal">Debit: ₹0.00 | Credit: ₹0.00 | Difference: ₹0.00</div>
-  <div class="actions">
-   <button class="success" onclick="saveVoucher()">Save Voucher</button>
-   <button class="secondary" onclick="resetVoucher()">Clear</button>
-  </div>
- </div>
-</section>
+  <div id="clientArea" class="hidden">
+    <div class="row" style="justify-content:space-between">
+      <div>
+        <h1 id="clientTitle">Client Name</h1>
+        <div class="muted small" id="clientInfo"></div>
+      </div>
+      <button class="secondary fixed" onclick="editClient()">Edit Client</button>
+    </div>
 
-<section id="daybook" class="page">
- <h2>Day Book</h2>
- <div class="card">
-  <div class="formrow">
-   <div class="field"><label>From Date</label><input type="date" id="dayFrom" onchange="renderDaybook()"></div>
-   <div class="field"><label>To Date</label><input type="date" id="dayTo" onchange="renderDaybook()"></div>
+    <div class="card">
+      <div class="row">
+        <div>
+          <strong>Financial Year Sheets</strong>
+          <div class="muted small">Ek client ki ek book mein multiple years</div>
+        </div>
+        <button class="fixed" onclick="addYear()">+ Add Financial Year</button>
+      </div>
+      <div class="year-tabs" id="yearTabs"></div>
+      <div class="muted small" id="activeYearLabel"></div>
+    </div>
+
+    <div id="dashboard" class="page">
+      <div class="stats">
+        <div class="stat">Total Income<strong id="totalIncome">₹0</strong></div>
+        <div class="stat">Total Expenses<strong id="totalExpense">₹0</strong></div>
+        <div class="stat">Net Profit / Loss<strong id="netProfit">₹0</strong></div>
+        <div class="stat">Total Vouchers<strong id="voucherCount">0</strong></div>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <h3>Current Year Transactions</h3>
+        <div class="table-wrap" id="recentTable"></div>
+      </div>
+    </div>
+
+    <div id="entries" class="page hidden">
+      <div class="card">
+        <h3>New Voucher Entry</h3>
+        <form id="entryForm">
+          <div class="form-grid">
+            <div class="field"><label>Date</label><input type="date" id="entryDate" required></div>
+            <div class="field"><label>Voucher Type</label>
+              <select id="entryType">
+                <option value="Income">Income</option>
+                <option value="Expense">Expense</option>
+                <option value="Journal">Journal / Other</option>
+              </select>
+            </div>
+            <div class="field"><label>Particulars / Ledger Name</label>
+              <input id="entryName" placeholder="e.g. Printing & Stationery" required>
+            </div>
+            <div class="field"><label>Amount (₹)</label>
+              <input id="entryAmount" type="number" min="0.01" step="0.01" required>
+            </div>
+            <div class="field" style="grid-column:1/-1"><label>Narration</label>
+              <textarea id="entryNote" rows="2" placeholder="Entry details..."></textarea>
+            </div>
+          </div>
+          <button type="submit" style="margin-top:14px">Save Voucher</button>
+        </form>
+      </div>
+    </div>
+
+    <div id="reports" class="page hidden">
+      <div class="card">
+        <h3>Current Year Report</h3>
+        <div class="table-wrap" id="reportTable"></div>
+      </div>
+    </div>
+
+    <div id="compare" class="page hidden">
+      <div class="card">
+        <h3>Financial Year Comparison - <span id="compareClient"></span></h3>
+        <p class="muted small">Ek hi client ke alag-alag financial years ka comparison.</p>
+        <div class="table-wrap" id="compareTable"></div>
+      </div>
+    </div>
+
+    <div id="backup" class="page hidden">
+      <div class="card">
+        <h3>Backup & Restore</h3>
+        <p class="muted">Apne sabhi clients aur unke financial years ka backup JSON file mein save karein.</p>
+        <button onclick="downloadBackup()">Export Full Backup</button>
+        <hr style="border-color:var(--border);margin:20px 0">
+        <label>Restore Backup File</label>
+        <input type="file" id="restoreFile" accept=".json">
+        <button class="green" style="margin-top:10px" onclick="restoreBackup()">Restore Backup</button>
+      </div>
+    </div>
   </div>
-  <div class="table-wrap" id="daybookTable"></div>
- </div>
-</section>
-
-<section id="ledger" class="page">
- <h2>Account Ledger</h2>
- <div class="card">
-  <div class="formrow">
-   <div class="field"><label>Select Account</label><select id="ledgerAccount" onchange="renderLedger()"></select></div>
-  </div>
-  <div class="table-wrap" id="ledgerTable"></div>
- </div>
-</section>
-
-<section id="trial" class="page">
- <h2>Trial Balance</h2>
- <div class="card">
-  <div class="table-wrap" id="trialTable"></div>
- </div>
-</section>
-
-<section id="pl" class="page">
- <h2>Profit & Loss Account</h2>
- <div class="card">
-  <div class="table-wrap" id="plTable"></div>
- </div>
-</section>
-
-<section id="balance" class="page">
- <h2>Balance Sheet</h2>
- <div class="card">
-  <div class="table-wrap" id="balanceTable"></div>
- </div>
-</section>
-
-<section id="accounts" class="page">
- <h2>Chart of Accounts</h2>
- <div class="card">
-  <h3>Add New Ledger Account</h3>
-  <div class="formrow">
-   <div class="field"><label>Account Name</label><input id="newAccount" placeholder="Account name"></div>
-   <div class="field"><label>Account Group</label>
-    <select id="newGroup">
-     <option value="Asset">Asset</option><option value="Liability">Liability</option>
-     <option value="Capital">Capital</option><option value="Income">Income</option>
-     <option value="Expense">Expense</option>
-    </select>
-   </div>
-   <div class="field"><label>Opening Balance</label><input type="number" id="newOpening" value="0"></div>
-   <div class="field"><label>Opening Balance Side</label>
-    <select id="newSide"><option>Dr</option><option>Cr</option></select>
-   </div>
-  </div>
-  <button onclick="addAccount()">Add Account</button>
- </div>
- <div class="card"><h3>Available Accounts</h3><div class="table-wrap" id="accountsTable"></div></div>
-</section>
-
-<section id="calculator" class="page">
- <h2>Accounting Calculator</h2>
- <div class="card" style="max-width:390px">
-  <div class="calculator">
-   <div class="calc-display" id="calcDisplay">0</div>
-   <div class="calc-grid">
-    <button class="clear" onclick="calcClear()">AC</button>
-    <button onclick="calcInput('%')">%</button>
-    <button onclick="calcBack()">⌫</button>
-    <button class="op" onclick="calcInput('/')">÷</button>
-    <button onclick="calcInput('7')">7</button><button onclick="calcInput('8')">8</button>
-    <button onclick="calcInput('9')">9</button><button class="op" onclick="calcInput('*')">×</button>
-    <button onclick="calcInput('4')">4</button><button onclick="calcInput('5')">5</button>
-    <button onclick="calcInput('6')">6</button><button class="op" onclick="calcInput('-')">−</button>
-    <button onclick="calcInput('1')">1</button><button onclick="calcInput('2')">2</button>
-    <button onclick="calcInput('3')">3</button><button class="op" onclick="calcInput('+')">+</button>
-    <button onclick="calcInput('0')">0</button><button onclick="calcInput('.')">.</button>
-    <button class="equal" style="grid-column:span 2" onclick="calcResult()">=</button>
-   </div>
-  </div>
-  <div class="actions">
-   <button onclick="copyCalc()">Copy Result</button>
-   <button class="secondary" onclick="useCalcInVoucher()">Use in Voucher</button>
-  </div>
- </div>
-</section>
-
-<section id="backup" class="page">
- <h2>Backup & Export</h2>
- <div class="card">
-  <h3>Export Accounting Reports</h3>
-  <p style="font-size:13px;color:#718096">Export the current accounting data and reports.</p>
-  <div class="actions">
-   <button onclick="exportPDF()">Export PDF</button>
-   <button class="success" onclick="exportExcel()">Export Excel (.xlsx)</button>
-   <button class="dark" onclick="exportWord()">Export Word (.doc)</button>
-  </div>
- </div>
- <div class="card">
-  <h3>Data Backup</h3>
-  <div class="actions">
-   <button onclick="backupData()">Download JSON Backup</button>
-   <button class="secondary" onclick="document.getElementById('restoreFile').click()">Restore Backup</button>
-   <input type="file" id="restoreFile" accept=".json" style="display:none" onchange="restoreData(event)">
-  </div>
- </div>
- <div class="card">
-  <h3>Important Information</h3>
-  <p style="font-size:13px;color:#718096">Data is stored in this browser using localStorage. Regularly download a backup. Clearing browser data may delete your accounting records.</p>
-  <button class="danger" onclick="clearAllData()">Delete All Accounting Data</button>
- </div>
-</section>
-
 </main>
+</div>
+
+<div id="clientModal" class="hidden" style="position:fixed;inset:0;background:#000b;z-index:5;display:none;align-items:center;justify-content:center;padding:15px">
+  <div class="card" style="width:min(550px,100%);max-height:90vh;overflow:auto">
+    <h3 id="modalTitle">Add New Client</h3>
+    <form id="clientForm">
+      <input type="hidden" id="editClientId">
+      <div class="form-grid">
+        <div class="field"><label>Business / Client Name *</label><input id="clientName" required></div>
+        <div class="field"><label>Mobile Number</label><input id="clientMobile"></div>
+        <div class="field"><label>PAN Number</label><input id="clientPan"></div>
+        <div class="field"><label>GSTIN</label><input id="clientGstin"></div>
+        <div class="field" style="grid-column:1/-1"><label>Address</label><textarea id="clientAddress" rows="2"></textarea></div>
+      </div>
+      <div class="row" style="margin-top:16px">
+        <button type="submit">Save Client</button>
+        <button type="button" class="secondary" onclick="closeClientModal()">Cancel</button>
+      </div>
+    </form>
+  </div>
 </div>
 
 <footer>© Copyright 2026 SAFS ASSOCIATE. All Rights Reserved.</footer>
 
 <script>
-const KEY="safs_ca_accounting_v2";
-const money=n=>"₹"+Number(n||0).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2});
-const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
-const today=()=>new Date().toISOString().slice(0,10);
+const STORAGE_KEY = "SAFS_ASSOCIATE_MULTI_CLIENT_BOOKS_V2";
+let data = loadData();
+let activeClientId = null;
+let activeYear = null;
+let currentPage = "dashboard";
 
-const defaultAccounts=[
- ["Cash in Hand","Asset"],["Bank Account","Asset"],["Sundry Debtors","Asset"],
- ["Furniture","Asset"],["Computer & Equipment","Asset"],["Input CGST","Asset"],
- ["Input SGST","Asset"],["Input IGST","Asset"],["Sundry Creditors","Liability"],
- ["Output CGST","Liability"],["Output SGST","Liability"],["Output IGST","Liability"],
- ["Capital Account","Capital"],["Drawings","Capital"],["Sales Account","Income"],
- ["Service Income","Income"],["Interest Received","Income"],["Purchase Account","Expense"],
- ["Salary","Expense"],["Rent","Expense"],["Electricity","Expense"],
- ["Stationery","Expense"],["Internet Expenses","Expense"],["Travelling Expenses","Expense"],
- ["Bank Charges","Expense"],["Depreciation","Expense"]
-];
-
-let data=loadData();
 function loadData(){
- try{
-  const x=JSON.parse(localStorage.getItem(KEY));
-  if(x&&Array.isArray(x.accounts)&&Array.isArray(x.vouchers))return x;
- }catch(e){}
- return {accounts:defaultAccounts.map(a=>({id:uid(),name:a[0],group:a[1],opening:0,side:"Dr"})),vouchers:[]};
+  try{return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {clients:[]};}
+  catch(e){return {clients:[]};}
 }
-function persist(){localStorage.setItem(KEY,JSON.stringify(data));}
-function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
-function accountOptions(){
- return '<option value="">Select Account</option>'+data.accounts.map(a=>`<option value="${a.id}">${esc(a.name)}</option>`).join("");
+function saveData(){
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(data));
 }
-function account(id){return data.accounts.find(a=>a.id===id);}
-function showPage(id,btn){
- document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
- document.getElementById(id).classList.add("active");
- document.querySelectorAll(".nav").forEach(b=>b.classList.remove("active"));
- if(btn)btn.classList.add("active");
- refresh();
+function uid(){return "ID"+Date.now()+Math.random().toString(16).slice(2,7);}
+function money(n){return "₹"+Number(n||0).toLocaleString("en-IN",{maximumFractionDigits:2});}
+function esc(s){
+  return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 }
-function refresh(){
- renderDashboard();renderDaybook();renderLedger();renderTrial();
- renderPL();renderBalance();renderAccounts();updateLedgerSelect();
+function selectedClient(){return data.clients.find(c=>c.id===activeClientId);}
+function selectedBook(){
+  const c=selectedClient();
+  return c ? c.years.find(y=>y.id===activeYear) : null;
 }
-function addVoucherLine(){
- const div=document.createElement("div");
- div.className="line-row";
- div.innerHTML=`
- <select class="drAccount" onchange="calcVoucherTotals()">${accountOptions()}</select>
- <select class="crAccount" onchange="calcVoucherTotals()">${accountOptions()}</select>
- <input class="lineAmount" type="text" inputmode="decimal" placeholder="Amount / formula" oninput="calcVoucherTotals()" onblur="formatAmount(this)">
- <span class="drTotal">0.00</span><span class="crTotal">0.00</span>
- <button class="danger" onclick="this.parentElement.remove();calcVoucherTotals()">×</button>`;
- document.getElementById("voucherLines").appendChild(div);
+function yearLabel(y){return y.replace("-","-");}
+function renderClients(){
+  const q=document.getElementById("searchClient").value.toLowerCase();
+  const box=document.getElementById("clientList");
+  const clients=data.clients.filter(c=>
+    c.name.toLowerCase().includes(q) ||
+    (c.pan||"").toLowerCase().includes(q) ||
+    (c.gstin||"").toLowerCase().includes(q)
+  );
+  box.innerHTML=clients.map(c=>`
+    <div class="client-item ${c.id===activeClientId?'active':''}" onclick="selectClient('${c.id}')">
+      <strong>${esc(c.name)}</strong>
+      <div class="muted small">${esc(c.code)} · ${c.years.length} Financial Year(s)</div>
+    </div>`).join("") || '<p class="muted small">No client found.</p>';
 }
-function numericInput(el){
- let v=el.value.trim();
- if(!v)return 0;
- try{
-  if(!/^[0-9+\-*/().%\s]+$/.test(v))return NaN;
-  v=v.replace(/(\d+(?:\.\d+)?)%/g,"($1/100)");
-  let result=Function('"use strict";return ('+v+')')();
-  return Number.isFinite(result)&&result>=0?result:NaN;
- }catch(e){return NaN;}
+function selectClient(id){
+  activeClientId=id;
+  const c=selectedClient();
+  if(!c)return;
+  if(!activeYear || !c.years.some(y=>y.id===activeYear)) activeYear=c.years[0]?.id||null;
+  document.getElementById("noClient").classList.add("hidden");
+  document.getElementById("clientArea").classList.remove("hidden");
+  renderAll();
 }
-function formatAmount(el){
- const n=numericInput(el);
- if(Number.isFinite(n))el.value=n.toFixed(2);
+function renderAll(){
+  const c=selectedClient(), b=selectedBook();
+  if(!c)return;
+  document.getElementById("clientTitle").textContent=c.name;
+  document.getElementById("clientInfo").textContent=
+    [c.code,c.mobile&&"Mobile: "+c.mobile,c.pan&&"PAN: "+c.pan,c.gstin&&"GSTIN: "+c.gstin].filter(Boolean).join("  |  ");
+  document.getElementById("yearTabs").innerHTML=c.years.map(y=>`
+    <button class="year-tab ${y.id===activeYear?'active':''}" onclick="selectYear('${y.id}')">FY ${esc(y.name)}</button>
+  `).join("");
+  document.getElementById("activeYearLabel").textContent=b?"Active Sheet: Financial Year "+b.name:"No financial year added.";
+  document.getElementById("compareClient").textContent=c.name;
+  renderDashboard();
+  renderReports();
+  renderComparison();
+  renderClients();
+  showPage(currentPage);
 }
-function calcVoucherTotals(){
- let dr=0,cr=0,valid=true;
- document.querySelectorAll("#voucherLines .line-row").forEach(row=>{
-  const amount=numericInput(row.querySelector(".lineAmount"));
-  const d=row.querySelector(".drAccount").value;
-  const c=row.querySelector(".crAccount").value;
-  if(!Number.isFinite(amount)){valid=false;return;}
-  if(d)dr+=amount;
-  if(c)cr+=amount;
-  row.querySelector(".drTotal").textContent=d?amount.toFixed(2):"0.00";
-  row.querySelector(".crTotal").textContent=c?amount.toFixed(2):"0.00";
- });
- const diff=dr-cr;
- document.getElementById("voucherTotal").textContent=
- `Debit: ${money(dr)} | Credit: ${money(cr)} | Difference: ${money(Math.abs(diff))} ${valid?"":"| Invalid amount"}`;
- document.getElementById("voucherTotal").style.color=valid&&Math.abs(diff)<.005?"#13875b":"#c43e48";
- return {dr,cr,diff,valid};
+function selectYear(id){activeYear=id;renderAll();}
+function addYear(){
+  const c=selectedClient();if(!c)return;
+  const name=prompt("Financial Year enter karein (example: 2026-27):");
+  if(!name)return;
+  const clean=name.trim();
+  if(!/^\d{4}-\d{2}$/.test(clean)){
+    alert("Financial Year ka format 2026-27 jaisa hona chahiye.");return;
+  }
+  if(c.years.some(y=>y.name===clean)){alert("Ye Financial Year pehle se maujood hai.");return;}
+  const y={id:uid(),name:clean,vouchers:[]};
+  c.years.push(y);
+  c.years.sort((a,b)=>a.name.localeCompare(b.name));
+  activeYear=y.id;
+  saveData();renderAll();
 }
-function resetVoucher(){
- document.getElementById("voucherLines").innerHTML="";
- document.getElementById("vNarration").value="";
- document.getElementById("vDate").value=today();
- document.getElementById("vNumber").value="V-"+String(data.vouchers.length+1).padStart(4,"0");
- addVoucherLine();calcVoucherTotals();
+function showNewClient(){
+  document.getElementById("clientForm").reset();
+  document.getElementById("editClientId").value="";
+  document.getElementById("modalTitle").textContent="Add New Client";
+  document.getElementById("clientModal").style.display="flex";
 }
-function saveVoucher(){
- const totals=calcVoucherTotals();
- if(!totals.valid){alert("Please enter valid amounts.");return;}
- if(Math.abs(totals.diff)>.005||totals.dr===0){alert("Debit aur Credit total equal hona chahiye.");return;}
- const entries=[];
- let invalid=false;
- document.querySelectorAll("#voucherLines .line-row").forEach(row=>{
-  const d=row.querySelector(".drAccount").value;
-  const c=row.querySelector(".crAccount").value;
-  const amount=numericInput(row.querySelector(".lineAmount"));
-  if(!d&&!c)return;
-  if(!Number.isFinite(amount)||amount<=0||(!d&&!c)|| (d&&c&&d===c)){invalid=true;return;}
-  if(d)entries.push({accountId:d,side:"Dr",amount});
-  if(c)entries.push({accountId:c,side:"Cr",amount});
- });
- if(invalid||!entries.length){alert("Har entry mein valid account aur amount select karein.");return;}
- const v={
-  id:uid(),number:document.getElementById("vNumber").value,
-  date:document.getElementById("vDate").value||today(),
-  type:document.getElementById("vType").value,
-  narration:document.getElementById("vNarration").value,
-  entries
- };
- data.vouchers.push(v);persist();alert("Voucher successfully saved.");
- resetVoucher();refresh();
+function closeClientModal(){document.getElementById("clientModal").style.display="none";}
+function editClient(){
+  const c=selectedClient();if(!c)return;
+  document.getElementById("editClientId").value=c.id;
+  document.getElementById("clientName").value=c.name;
+  document.getElementById("clientMobile").value=c.mobile||"";
+  document.getElementById("clientPan").value=c.pan||"";
+  document.getElementById("clientGstin").value=c.gstin||"";
+  document.getElementById("clientAddress").value=c.address||"";
+  document.getElementById("modalTitle").textContent="Edit Client Details";
+  document.getElementById("clientModal").style.display="flex";
+}
+document.getElementById("clientForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const id=document.getElementById("editClientId").value;
+  const obj={
+    name:document.getElementById("clientName").value.trim(),
+    mobile:document.getElementById("clientMobile").value.trim(),
+    pan:document.getElementById("clientPan").value.trim().toUpperCase(),
+    gstin:document.getElementById("clientGstin").value.trim().toUpperCase(),
+    address:document.getElementById("clientAddress").value.trim()
+  };
+  if(!obj.name)return;
+  if(id){
+    const c=data.clients.find(x=>x.id===id);Object.assign(c,obj);
+  }else{
+    const c={id:uid(),code:"SAFS-"+String(data.clients.length+1).padStart(4,"0"),
+      ...obj,years:[]};
+    data.clients.push(c);
+    activeClientId=c.id;
+    const y={id:uid(),name:"2026-27",vouchers:[]};
+    c.years.push(y);activeYear=y.id;
+  }
+  saveData();closeClientModal();selectClient(activeClientId);
+});
+function showPage(page,btn){
+  currentPage=page;
+  document.querySelectorAll(".page").forEach(p=>p.classList.add("hidden"));
+  const target=document.getElementById(page);
+  if(target)target.classList.remove("hidden");
+  document.querySelectorAll(".nav").forEach(n=>n.classList.remove("active"));
+  if(btn)btn.classList.add("active");
+  else document.querySelectorAll(".nav").forEach(n=>{
+    if(n.getAttribute("onclick")?.includes("'"+page+"'"))n.classList.add("active");
+  });
+  if(page==="reports")renderReports();
+  if(page==="compare")renderComparison();
 }
 function renderDashboard(){
- const dr=data.vouchers.reduce((s,v)=>s+v.entries.filter(e=>e.side==="Dr").reduce((a,e)=>a+e.amount,0),0);
- const cr=data.vouchers.reduce((s,v)=>s+v.entries.filter(e=>e.side==="Cr").reduce((a,e)=>a+e.amount,0),0);
- document.getElementById("dVouchers").textContent=data.vouchers.length;
- document.getElementById("dDebit").textContent=money(dr);
- document.getElementById("dCredit").textContent=money(cr);
- document.getElementById("dDifference").textContent=money(Math.abs(dr-cr));
- const recent=[...data.vouchers].reverse().slice(0,6);
- document.getElementById("recentTable").innerHTML=table(["Date","Voucher","Type","Narration","Amount"],recent.map(v=>[
- v.date,v.number,v.type,v.narration,money(v.entries.filter(e=>e.side==="Dr").reduce((s,e)=>s+e.amount,0))
- ]));
+  const b=selectedBook();if(!b)return;
+  const income=b.vouchers.filter(v=>v.type==="Income").reduce((s,v)=>s+v.amount,0);
+  const expense=b.vouchers.filter(v=>v.type==="Expense").reduce((s,v)=>s+v.amount,0);
+  document.getElementById("totalIncome").textContent=money(income);
+  document.getElementById("totalExpense").textContent=money(expense);
+  document.getElementById("netProfit").textContent=money(income-expense);
+  document.getElementById("voucherCount").textContent=b.vouchers.length;
+  document.getElementById("recentTable").innerHTML=makeVoucherTable(b.vouchers.slice().reverse().slice(0,10));
 }
-function table(headers,rows){
- if(!rows.length)return "<p style='color:#718096;font-size:13px'>No records available.</p>";
- return `<table><thead><tr>${headers.map(h=>`<th>${esc(h)}</th>`).join("")}</tr></thead><tbody>${
- rows.map(r=>`<tr>${r.map(c=>`<td>${c??""}</td>`).join("")}</tr>`).join("")
- }</tbody></table>`;
+function makeVoucherTable(vouchers){
+  if(!vouchers.length)return '<p class="muted">Is year mein abhi koi voucher nahi hai.</p>';
+  return `<table><thead><tr><th>Date</th><th>Type</th><th>Particulars</th><th>Amount</th><th>Narration</th><th>Action</th></tr></thead><tbody>
+  ${vouchers.map(v=>`<tr>
+    <td>${esc(v.date)}</td><td>${esc(v.type)}</td><td>${esc(v.name)}</td>
+    <td>${money(v.amount)}</td><td>${esc(v.note||"")}</td>
+    <td><button class="danger small" onclick="deleteVoucher('${v.id}')">Delete</button></td>
+  </tr>`).join("")}</tbody></table>`;
 }
-function renderDaybook(){
- const from=document.getElementById("dayFrom")?.value||"";
- const to=document.getElementById("dayTo")?.value||"";
- const list=data.vouchers.filter(v=>(!from||v.date>=from)&&(!to||v.date<=to));
- document.getElementById("daybookTable").innerHTML=table(
- ["Date","Voucher No.","Type","Narration","Debit","Credit","Action"],
- list.map(v=>{
-  const dr=v.entries.filter(e=>e.side==="Dr").reduce((s,e)=>s+e.amount,0);
-  const cr=v.entries.filter(e=>e.side==="Cr").reduce((s,e)=>s+e.amount,0);
-  return [v.date,esc(v.number),esc(v.type),esc(v.narration),money(dr),money(cr),
-  `<button class="danger" onclick="deleteVoucher('${v.id}')">Delete</button>`];
- }));
-}
-function deleteVoucher(id){
- if(!confirm("Delete this voucher?"))return;
- data.vouchers=data.vouchers.filter(v=>v.id!==id);persist();refresh();
-}
-function updateLedgerSelect(){
- const el=document.getElementById("ledgerAccount");
- if(!el)return;
- const old=el.value;
- el.innerHTML=accountOptions();
- if(account(old))el.value=old;
-}
-function getAccountTotals(id){
- let dr=0,cr=0;
- data.vouchers.forEach(v=>v.entries.filter(e=>e.accountId===id).forEach(e=>{
-  if(e.side==="Dr")dr+=e.amount;else cr+=e.amount;
- }));
- return {dr,cr};
-}
-function renderLedger(){
- const id=document.getElementById("ledgerAccount")?.value;
- if(!id)return;
- const a=account(id);if(!a)return;
- const opening=Number(a.opening||0)*(a.side==="Dr"?1:-1);
- let running=opening;
- const rows=[];
- rows.push(["-","Opening Balance",a.side==="Dr"?money(Math.abs(opening)):"-",a.side==="Cr"?money(Math.abs(opening)):"-",money(Math.abs(opening))+" "+(running>=0?"Dr":"Cr")]);
- const tx=[];
- data.vouchers.forEach(v=>v.entries.filter(e=>e.accountId===id).forEach(e=>tx.push({date:v.date,number:v.number,narration:v.narration,side:e.side,amount:e.amount})));
- tx.sort((a,b)=>a.date.localeCompare(b.date));
- tx.forEach(e=>{
-  running+=e.side==="Dr"?e.amount:-e.amount;
-  rows.push([e.date,esc(e.number+" "+e.narration),e.side==="Dr"?money(e.amount):"-",e.side==="Cr"?money(e.amount):"-",money(Math.abs(running))+" "+(running>=0?"Dr":"Cr")]);
- });
- document.getElementById("ledgerTable").innerHTML=table(["Date","Particulars","Debit","Credit","Balance"],rows);
-}
-function renderTrial(){
- const rows=data.accounts.map(a=>{
-  const t=getAccountTotals(a.id);
-  let net=(a.side==="Dr"?Number(a.opening||0):-Number(a.opening||0))+t.dr-t.cr;
-  return [esc(a.name),net>0?money(net):"-",net<0?money(-net):"-"];
- });
- const totalDr=data.accounts.reduce((s,a)=>{let t=getAccountTotals(a.id);return s+Math.max(0,(a.side==="Dr"?Number(a.opening||0):-Number(a.opening||0))+t.dr-t.cr)},0);
- const totalCr=data.accounts.reduce((s,a)=>{let t=getAccountTotals(a.id);return s+Math.max(0,-((a.side==="Dr"?Number(a.opening||0):-Number(a.opening||0))+t.dr-t.cr))},0);
- rows.push(["TOTAL",money(totalDr),money(totalCr)]);
- document.getElementById("trialTable").innerHTML=table(["Account","Debit Balance","Credit Balance"],rows);
-}
-function accountNet(a){
- const t=getAccountTotals(a.id);
- return (a.side==="Dr"?Number(a.opening||0):-Number(a.opening||0))+t.dr-t.cr;
-}
-function renderPL(){
- const income=data.accounts.filter(a=>a.group==="Income");
- const expenses=data.accounts.filter(a=>a.group==="Expense");
- const inc=income.reduce((s,a)=>s-accountNet(a),0);
- const exp=expenses.reduce((s,a)=>s+accountNet(a),0);
- const rows=[
- ...income.map(a=>[esc(a.name),money(Math.max(0,-accountNet(a)))]),
- ["TOTAL INCOME",money(inc)],
- ...expenses.map(a=>[esc(a.name),money(Math.max(0,accountNet(a)))]),
- ["TOTAL EXPENSES",money(exp)],
- ["NET PROFIT / (LOSS)",money(inc-exp)]
- ];
- document.getElementById("plTable").innerHTML=table(["Particulars","Amount"],rows);
-}
-function renderBalance(){
- const groups=["Asset","Liability","Capital"];
- const rows=[];
- groups.forEach(g=>{
-  rows.push([`<b>${g.toUpperCase()}</b>`,""]);
-  data.accounts.filter(a=>a.group===g).forEach(a=>{
-   let n=accountNet(a);
-   rows.push([esc(a.name),money(Math.abs(n))+" "+(n>=0?"Dr":"Cr")]);
+document.getElementById("entryDate").value=new Date().toISOString().slice(0,10);
+document.getElementById("entryForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const b=selectedBook();if(!b){alert("Pehle financial year select karein.");return;}
+  const amount=Number(document.getElementById("entryAmount").value);
+  if(!(amount>0)){alert("Valid amount enter karein.");return;}
+  b.vouchers.push({
+    id:uid(),date:document.getElementById("entryDate").value,
+    type:document.getElementById("entryType").value,
+    name:document.getElementById("entryName").value.trim(),
+    amount,
+    note:document.getElementById("entryNote").value.trim()
   });
- });
- const inc=data.accounts.filter(a=>a.group==="Income").reduce((s,a)=>s-accountNet(a),0);
- const exp=data.accounts.filter(a=>a.group==="Expense").reduce((s,a)=>s+accountNet(a),0);
- rows.push(["Current Period Profit / (Loss)",money(inc-exp)]);
- document.getElementById("balanceTable").innerHTML=table(["Particulars","Balance"],rows);
+  saveData();e.target.reset();
+  document.getElementById("entryDate").value=new Date().toISOString().slice(0,10);
+  alert("Voucher saved successfully.");
+  renderAll();showPage("dashboard");
+});
+function deleteVoucher(id){
+  if(!confirm("Kya aap is voucher ko delete karna chahte hain?"))return;
+  const b=selectedBook();b.vouchers=b.vouchers.filter(v=>v.id!==id);
+  saveData();renderAll();
 }
-function renderAccounts(){
- document.getElementById("accountsTable").innerHTML=table(
- ["Account Name","Group","Opening Balance","Side"],
- data.accounts.map(a=>[esc(a.name),a.group,money(a.opening),a.side])
- );
+function renderReports(){
+  const b=selectedBook();if(!b)return;
+  const groups={};
+  b.vouchers.forEach(v=>{
+    const key=v.name+" ("+v.type+")";
+    groups[key]=(groups[key]||0)+v.amount;
+  });
+  const rows=Object.entries(groups);
+  document.getElementById("reportTable").innerHTML=`
+    <p class="muted">Financial Year: ${esc(b.name)}</p>
+    ${rows.length?`<table><thead><tr><th>Particulars</th><th>Amount</th></tr></thead><tbody>
+    ${rows.map(([n,a])=>`<tr><td>${esc(n)}</td><td>${money(a)}</td></tr>`).join("")}
+    </tbody></table>`:'<p class="muted">No entries available.</p>'}
+    <p class="muted small">Yeh basic voucher summary hai, statutory Trial Balance / P&L / Balance Sheet nahi.</p>`;
 }
-function addAccount(){
- const name=document.getElementById("newAccount").value.trim();
- if(!name){alert("Enter account name.");return;}
- if(data.accounts.some(a=>a.name.toLowerCase()===name.toLowerCase())){alert("Account already exists.");return;}
- const opening=Number(document.getElementById("newOpening").value)||0;
- if(opening<0){alert("Opening balance cannot be negative.");return;}
- data.accounts.push({id:uid(),name,group:document.getElementById("newGroup").value,opening,side:document.getElementById("newSide").value});
- document.getElementById("newAccount").value="";
- document.getElementById("newOpening").value="0";
- persist();refresh();
+function renderComparison(){
+  const c=selectedClient();if(!c)return;
+  document.getElementById("compareTable").innerHTML=`
+  <table><thead><tr><th>Financial Year Sheet</th><th>Total Income</th><th>Total Expenses</th><th>Net Difference</th><th>Vouchers</th></tr></thead><tbody>
+  ${c.years.map(y=>{
+    const inc=y.vouchers.filter(v=>v.type==="Income").reduce((s,v)=>s+v.amount,0);
+    const exp=y.vouchers.filter(v=>v.type==="Expense").reduce((s,v)=>s+v.amount,0);
+    return `<tr><td>FY ${esc(y.name)}</td><td>${money(inc)}</td><td>${money(exp)}</td><td>${money(inc-exp)}</td><td>${y.vouchers.length}</td></tr>`;
+  }).join("")}
+  </tbody></table>`;
 }
-let calcValue="0";
-function calcInput(x){
- if(calcValue==="0"&&/[0-9.]/.test(x))calcValue=x;
- else calcValue+=x;
- document.getElementById("calcDisplay").textContent=calcValue;
+function downloadBackup(){
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");a.href=url;a.download="SAFS-ASSOCIATE-Full-Backup.json";a.click();
+  URL.revokeObjectURL(url);
 }
-function calcClear(){calcValue="0";document.getElementById("calcDisplay").textContent="0";}
-function calcBack(){calcValue=calcValue.slice(0,-1)||"0";document.getElementById("calcDisplay").textContent=calcValue;}
-function calcResult(){
- try{
-  let exp=calcValue.replace(/(\d+(?:\.\d+)?)%/g,"($1/100)");
-  if(!/^[0-9+\-*/().\s]+$/.test(exp))throw Error();
-  const r=Function('"use strict";return ('+exp+')')();
-  if(!Number.isFinite(r))throw Error();
-  calcValue=String(Number(r.toFixed(8)));
-  document.getElementById("calcDisplay").textContent=calcValue;
- }catch(e){document.getElementById("calcDisplay").textContent="Invalid";calcValue="0";}
+function restoreBackup(){
+  const file=document.getElementById("restoreFile").files[0];
+  if(!file){alert("Pehle backup JSON file select karein.");return;}
+  const reader=new FileReader();
+  reader.onload=()=>{
+    try{
+      const obj=JSON.parse(reader.result);
+      if(!obj || !Array.isArray(obj.clients))throw new Error("Invalid backup");
+      if(!confirm("Restore karne par current data replace ho jayega. Continue?"))return;
+      data=obj;activeClientId=null;activeYear=null;saveData();
+      document.getElementById("clientArea").classList.add("hidden");
+      document.getElementById("noClient").classList.remove("hidden");
+      renderClients();alert("Backup restored.");
+    }catch(e){alert("Backup file valid nahi hai.");}
+  };
+  reader.readAsText(file);
 }
-function copyCalc(){
- calcResult();navigator.clipboard?.writeText(calcValue).then(()=>alert("Result copied."));
-}
-function openCalc(){showPage("calculator",document.querySelectorAll(".nav")[8]);}
-function useCalcInVoucher(){
- calcResult();
- const active=document.querySelector("#voucherLines .lineAmount");
- if(active){active.value=calcValue;calcVoucherTotals();}
- else{alert("Voucher mein amount field available nahi hai.");}
-}
-function exportRows(){
- const rows=[["Date","Voucher No","Type","Narration","Account","Debit","Credit"]];
- data.vouchers.forEach(v=>v.entries.forEach(e=>{
-  rows.push([v.date,v.number,v.type,v.narration,account(e.accountId)?.name||"Unknown",e.side==="Dr"?e.amount:0,e.side==="Cr"?e.amount:0]);
- }));
- return rows;
-}
-function exportExcel(){
- if(!window.XLSX){alert("Excel library load nahi hui. Internet check karein.");return;}
- const wb=XLSX.utils.book_new();
- XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(exportRows()),"Transactions");
- XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([["Account","Group","Opening","Side"],...data.accounts.map(a=>[a.name,a.group,a.opening,a.side])]),"Accounts");
- XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([["Account","Debit","Credit"],...data.accounts.map(a=>{let n=accountNet(a);return [a.name,Math.max(0,n),Math.max(0,-n)]})]),"Trial Balance");
- XLSX.writeFile(wb,"SAFS-Accounting-Report.xlsx");
-}
-function exportPDF(){
- if(!window.jspdf){alert("PDF library load nahi hui. Internet check karein.");return;}
- const {jsPDF}=window.jspdf;const doc=new jsPDF();
- doc.setFontSize(17);doc.text("SAFS ASSOCIATE",14,17);
- doc.setFontSize(10);doc.text("Professional CA Accounting Report",14,24);
- doc.autoTable({startY:31,head:[exportRows()[0]],body:exportRows().slice(1)});
- doc.save("SAFS-Accounting-Report.pdf");
-}
-function exportWord(){
- const rows=exportRows();
- const html=`<html><head><meta charset="utf-8"></head><body>
- <h1>SAFS ASSOCIATE</h1><h3>Professional CA Accounting Report</h3>
- <table border="1" cellspacing="0" cellpadding="6">
- ${rows.map((r,i)=>"<tr>"+r.map(c=>`<${i===0?"th":"td"}>${esc(c)}</${i===0?"th":"td"}>`).join("")+"</tr>").join("")}
- </table><p>© Copyright 2026 SAFS ASSOCIATE</p></body></html>`;
- const blob=new Blob(["\ufeff",html],{type:"application/msword"});
- downloadBlob(blob,"SAFS-Accounting-Report.doc");
-}
-function downloadBlob(blob,name){
- const url=URL.createObjectURL(blob);const a=document.createElement("a");
- a.href=url;a.download=name;a.click();URL.revokeObjectURL(url);
-}
-function backupData(){
- downloadBlob(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),"SAFS-Accounting-Backup.json");
-}
-function restoreData(event){
- const file=event.target.files[0];if(!file)return;
- const reader=new FileReader();
- reader.onload=()=>{
-  try{
-   const x=JSON.parse(reader.result);
-   if(!Array.isArray(x.accounts)||!Array.isArray(x.vouchers))throw Error();
-   if(!confirm("Current data replace ho jayega. Continue?"))return;
-   data=x;persist();refresh();alert("Backup restored.");
-  }catch(e){alert("Invalid backup file.");}
- };
- reader.readAsText(file);
- event.target.value="";
-}
-function clearAllData(){
- if(!confirm("WARNING: All vouchers and accounts will be deleted. Continue?"))return;
- localStorage.removeItem(KEY);
- data=loadData();persist();resetVoucher();refresh();
-}
-document.getElementById("vDate").value=today();
-document.getElementById("vNumber").value="V-"+String(data.vouchers.length+1).padStart(4,"0");
-addVoucherLine();persist();refresh();
+renderClients();
+if(data.clients.length)selectClient(data.clients[0].id);
 </script>
 </body>
 </html>
