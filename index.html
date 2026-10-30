@@ -3,506 +3,859 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SAFS ASSOCIATE Accounting</title>
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SAFS ASSOCIATE | Accounting Suite</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+
 <style>
-:root{--bg:#101722;--panel:#192638;--panel2:#22344a;--line:#34475e;--txt:#edf3fa;--muted:#9eafc3;--blue:#2699ed;--green:#18a878;--red:#d95768}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font:14px Arial,sans-serif}
-header{height:72px;background:#111e2d;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:10px 20px;gap:13px}
-header img{width:48px;height:48px;object-fit:contain}header h2{margin:0;font-size:20px}header small{color:var(--muted)}
-.layout{display:grid;grid-template-columns:260px 1fr;min-height:calc(100vh - 72px)}
-aside{background:#142131;padding:15px;border-right:1px solid var(--line)}
-main{padding:20px;min-width:0}.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:15px}
-h1{font-size:23px;margin:0 0 12px}h3{font-size:16px;margin:0 0 13px}
-small,.muted{color:var(--muted)}label{display:block;color:var(--muted);font-size:12px;margin:0 0 6px}
-input,select,textarea{width:100%;padding:10px;background:#101b29;border:1px solid var(--line);color:var(--txt);border-radius:6px}
-button{border:0;border-radius:6px;padding:10px 13px;background:var(--blue);color:white;cursor:pointer;font-weight:600}
-button:hover{filter:brightness(1.12)}button.secondary{background:var(--panel2);border:1px solid var(--line)}
-button.green{background:var(--green)}button.red{background:var(--red)}button.small{padding:6px 9px;font-size:12px}
-.nav{display:block;width:100%;text-align:left;background:transparent;color:var(--txt);margin:4px 0}
-.nav.active,.nav:hover{background:var(--panel2);border:1px solid var(--line)}
-.row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.row>*{flex:1;min-width:0}.row .fit{flex:0 0 auto}
-.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
-.stat{background:var(--panel2);padding:14px;border-radius:8px}.stat strong{display:block;font-size:20px;margin-top:8px}
-.client{padding:11px;border:1px solid var(--line);border-radius:7px;margin-top:8px;cursor:pointer;overflow-wrap:anywhere}
-.client.active{border-color:var(--blue);background:#1d3550}
-.yearbar{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
-.yearbtn{background:var(--panel2);border:1px solid var(--line)}.yearbtn.active{background:var(--blue)}
-.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:620px}
-th,td{padding:9px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
-th{background:var(--panel2);color:#dce8f5}td input,td select{min-width:100px;padding:8px}
-.right{text-align:right}.hidden{display:none!important}.positive{color:#35d6a0}.negative{color:#ff8290}
-.modal{position:fixed;inset:0;background:#000b;z-index:10;display:none;align-items:center;justify-content:center;padding:15px}
-.modalbox{width:min(650px,100%);max-height:90vh;overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px}
-footer{text-align:center;color:var(--muted);padding:18px;font-size:12px}
-.calc{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.calc button{padding:13px 5px;background:var(--panel2)}
-.calc input{grid-column:1/-1;text-align:right;font-size:22px}
-@media(max-width:850px){.layout{grid-template-columns:1fr}aside{border-right:0;border-bottom:1px solid var(--line)}.grid4{grid-template-columns:repeat(2,1fr)}main{padding:12px}}
-@media(max-width:500px){.grid2{grid-template-columns:1fr}.row>*{min-width:100%}.row .fit{min-width:auto}}
+:root{
+ --navy:#12213a;--blue:#2459a6;--bg:#f2f5fa;
+ --white:#fff;--text:#26364d;--muted:#738198;
+ --border:#dfe6ef;--green:#13875b;--red:#d64545
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);font-family:Arial,sans-serif;color:var(--text)}
+header{
+ background:linear-gradient(110deg,#101d35,#2456a6);
+ color:white;padding:12px 20px;display:flex;align-items:center;
+ justify-content:space-between;gap:12px;flex-wrap:wrap
+}
+.brand{display:flex;align-items:center;gap:12px}
+.brand img{
+ width:58px;height:54px;object-fit:contain;
+ background:#fff;padding:5px;border-radius:8px;display:block
+}
+.brand h1{font-size:20px;margin:0;letter-spacing:1px}
+.brand p{font-size:10px;letter-spacing:2px;margin:5px 0 0;color:#dce8ff}
+.header-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.header-right select{width:auto;min-width:170px}
+.layout{display:flex;min-height:calc(100vh - 80px)}
+.sidebar{width:220px;background:var(--navy);padding:12px 9px;flex-shrink:0}
+.sidebar h4{color:#8fa9d0;font-size:10px;padding-left:10px;letter-spacing:1px}
+.nav{
+ display:block;width:100%;text-align:left;padding:11px;margin:3px 0;
+ border:0;background:transparent;color:#dce6f7;border-radius:6px;
+ cursor:pointer;font-size:13px
+}
+.nav:hover,.nav.active{background:#294b7b;color:white}
+main{flex:1;padding:20px;min-width:0}
+.page{display:none}.page.active{display:block}
+h2{font-size:21px;margin:0 0 16px;color:#172d4c}
+h3{font-size:15px;margin:0 0 13px}
+.card{
+ background:white;border:1px solid var(--border);border-radius:10px;
+ padding:16px;margin-bottom:15px;box-shadow:0 3px 12px #152b4808
+}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:12px}
+.stat{background:white;border:1px solid var(--border);border-radius:9px;padding:16px}
+.stat small{color:var(--muted);font-size:12px}
+.stat strong{display:block;font-size:21px;margin-top:8px;color:#214b83}
+label{font-size:12px;font-weight:bold;display:block;margin-bottom:6px}
+input,select,textarea{
+ width:100%;padding:10px;border:1px solid #d8e0eb;border-radius:6px;
+ font-size:13px;background:white;color:var(--text)
+}
+.field{flex:1;min-width:145px}
+.row{display:flex;gap:11px;flex-wrap:wrap;margin-bottom:12px}
+button{
+ border:0;border-radius:6px;padding:10px 13px;background:var(--blue);
+ color:white;font-weight:bold;font-size:12px;cursor:pointer
+}
+button:hover{filter:brightness(1.08)}
+.secondary{background:#e8eef7;color:#25466f}
+.success{background:var(--green)}
+.danger{background:var(--red)}
+.dark{background:#172b4d}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.table-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:650px;font-size:12px}
+th{background:#edf2f9;text-align:left;color:#314867}
+td,th{padding:10px 9px;border-bottom:1px solid var(--border)}
+.totalbar{background:#edf3fa;padding:12px;border-radius:7px;font-size:13px;font-weight:bold;margin:12px 0}
+.entry-row{
+ display:grid;grid-template-columns:minmax(180px,1fr) 135px 135px 42px;
+ gap:7px;margin-bottom:7px;align-items:center
+}
+.entry-heading{font-size:11px;color:#6c7d94;font-weight:bold;margin-bottom:8px}
+.muted{color:var(--muted);font-size:12px}
+.empty{padding:18px;text-align:center;color:var(--muted);font-size:13px}
+.calc{background:#172b4d;padding:14px;border-radius:10px;max-width:340px}
+.calc-display{
+ background:white;color:#14243d;text-align:right;padding:14px;
+ font-size:24px;border-radius:6px;margin-bottom:9px;min-height:53px;
+ overflow:auto;white-space:nowrap
+}
+.calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.calc-grid button{padding:14px 4px;background:#314e79}
+.calc-grid .op{background:#d9e7ff;color:#17365e}
+.calc-grid .equal{background:#13875b}
+.calc-grid .clear{background:#b83c48}
+footer{text-align:center;background:#101d35;color:#dce6f7;padding:14px;font-size:12px}
+@media(max-width:760px){
+ .layout{display:block}
+ .sidebar{width:100%;display:flex;overflow-x:auto;padding:7px}
+ .sidebar h4{display:none}
+ .nav{white-space:nowrap;width:auto;flex-shrink:0}
+ main{padding:11px}
+ .entry-row{grid-template-columns:1fr 1fr}
+ .entry-row button{grid-column:span 2}
+ .brand h1{font-size:16px}
+ header{padding:10px}
+ .header-right{width:100%}
+ .header-right select{flex:1}
+}
+@media print{
+ header,.sidebar,footer,.no-print{display:none!important}
+ .layout{display:block}main{padding:0}
+ .page{display:none!important}
+ .page.active{display:block!important}
+ .card{box-shadow:none}
+}
 </style>
 </head>
+
 <body>
+
 <header>
-<img src="./safs.png" alt="SAFS Logo" onerror="this.style.display='none'">
-<div><h2>SAFS ASSOCIATE</h2><small>Accounting & Client Management Software</small></div>
+ <div class="brand">
+  <img src="./safs.png" alt="SAFS Logo">
+  <div>
+   <h1>SAFS ASSOCIATE</h1>
+   <p>PROFESSIONAL ACCOUNTING SUITE</p>
+  </div>
+ </div>
+ <div class="header-right">
+  <span id="activeClientLabel">No client selected</span>
+  <select id="clientSelect" onchange="selectClient(this.value)">
+   <option value="">Select Client</option>
+  </select>
+  <select id="yearSelect" onchange="selectYear(this.value)">
+   <option value="">Select Financial Year</option>
+  </select>
+ </div>
 </header>
 
 <div class="layout">
-<aside>
-<h3>Client Books</h3>
-<input id="clientSearch" placeholder="Search client name / PAN / GSTIN" oninput="renderClientList()">
-<div id="clientList"></div>
-<button style="width:100%;margin-top:12px" onclick="openClientModal()">+ Add New Client</button>
-<hr style="border-color:var(--line);margin:18px 0">
-<button class="nav active" data-page="dashboard" onclick="go('dashboard',this)">▦ Dashboard</button>
-<button class="nav" data-page="ledgers" onclick="go('ledgers',this)">▤ Ledger Master</button>
-<button class="nav" data-page="vouchers" onclick="go('vouchers',this)">＋ Voucher Entry</button>
-<button class="nav" data-page="daybook" onclick="go('daybook',this)">☷ Day Book</button>
-<button class="nav" data-page="ledgerreport" onclick="go('ledgerreport',this)">▤ Account Ledger</button>
-<button class="nav" data-page="trial" onclick="go('trial',this)">▦ Trial Balance</button>
-<button class="nav" data-page="pl" onclick="go('pl',this)">₹ Profit & Loss</button>
-<button class="nav" data-page="balance" onclick="go('balance',this)">▣ Balance Sheet</button>
-<button class="nav" data-page="compare" onclick="go('compare',this)">⇄ Year Comparison</button>
-<button class="nav" data-page="calculator" onclick="go('calculator',this)">⌗ Calculator</button>
-<button class="nav" data-page="backup" onclick="go('backup',this)">⬇ Backup / Export</button>
+
+<aside class="sidebar">
+ <h4>WORKSPACE</h4>
+ <button class="nav active" onclick="page('dashboard',this)">▦ Dashboard</button>
+ <button class="nav" onclick="page('clients',this)">♙ Client Master</button>
+ <button class="nav" onclick="page('ledgers',this)">☷ Ledger Master</button>
+ <button class="nav" onclick="page('voucher',this)">＋ Voucher Entry</button>
+ <button class="nav" onclick="page('daybook',this)">▤ Day Book</button>
+ <button class="nav" onclick="page('ledgerReport',this)">▥ Account Ledger</button>
+ <button class="nav" onclick="page('trial',this)">▤ Trial Balance</button>
+ <button class="nav" onclick="page('pl',this)">↗ Profit & Loss</button>
+ <button class="nav" onclick="page('balance',this)">▣ Balance Sheet</button>
+ <button class="nav" onclick="page('calculator',this)">⊞ Calculator</button>
+ <button class="nav" onclick="page('backup',this)">⇩ Export / Backup</button>
 </aside>
 
 <main>
-<div id="welcome" class="card">
-<h1>Welcome to SAFS ASSOCIATE</h1>
-<p class="muted">Client add karein ya left side se apna existing client search karke select karein.</p>
-<button onclick="openClientModal()">+ Create First Client</button>
-</div>
 
-<div id="workarea" class="hidden">
-<div class="row" style="justify-content:space-between">
-<div><h1 id="clientHeading">Client</h1><small id="clientDetails"></small></div>
-<div class="fit row">
-<button class="secondary" onclick="editClient()">Edit Client</button>
-<button class="secondary" onclick="deleteClient()">Delete Client</button>
-</div>
-</div>
-
-<div class="card">
-<div class="row">
-<div><b>Financial Year Sheets</b><br><small>Ek client ki ek book — har year ki alag sheet</small></div>
-<button class="fit" onclick="addYear()">+ Add Financial Year</button>
-</div>
-<div id="yearTabs" class="yearbar"></div>
-<small id="yearInfo"></small>
-</div>
-
-<section id="dashboard" class="page">
-<div class="grid4">
-<div class="stat">Income<strong id="dashIncome">₹0</strong></div>
-<div class="stat">Expenses<strong id="dashExpense">₹0</strong></div>
-<div class="stat">Net Profit / Loss<strong id="dashProfit">₹0</strong></div>
-<div class="stat">Vouchers<strong id="dashCount">0</strong></div>
-</div>
-<div class="card" style="margin-top:15px"><h3>Recent Vouchers</h3><div id="recentVouchers" class="tablewrap"></div></div>
+<section id="dashboard" class="page active">
+ <h2>Accounting Dashboard</h2>
+ <div id="needClient" class="card empty">
+  Client select karein ya Client Master se naya client add karein.
+ </div>
+ <div class="cards">
+  <div class="stat"><small>Current Client</small><strong id="statClient">—</strong></div>
+  <div class="stat"><small>Financial Year</small><strong id="statYear">—</strong></div>
+  <div class="stat"><small>Total Vouchers</small><strong id="statV">0</strong></div>
+  <div class="stat"><small>Total Ledgers</small><strong id="statL">0</strong></div>
+  <div class="stat"><small>Total Debit</small><strong id="statD">₹0.00</strong></div>
+  <div class="stat"><small>Total Credit</small><strong id="statC">₹0.00</strong></div>
+ </div>
+ <div class="card" style="margin-top:15px">
+  <h3>Recent Vouchers</h3>
+  <div id="recent"></div>
+ </div>
 </section>
 
-<section id="ledgers" class="page hidden">
-<div class="card">
-<div class="row"><h3>Ledger Master</h3><button class="fit" onclick="openLedgerModal()">+ Add Ledger</button></div>
-<div class="tablewrap" id="ledgerTable"></div>
-</div>
+<section id="clients" class="page">
+ <h2>Client Master</h2>
+ <div class="card">
+  <h3>Add / Edit Client</h3>
+  <input type="hidden" id="editClientId">
+  <div class="row">
+   <div class="field"><label>Client / Business Name *</label><input id="clientName" placeholder="Business name"></div>
+   <div class="field"><label>Mobile</label><input id="clientMobile"></div>
+   <div class="field"><label>PAN</label><input id="clientPan"></div>
+   <div class="field"><label>GSTIN</label><input id="clientGstin"></div>
+  </div>
+  <div class="row">
+   <div class="field"><label>Address</label><input id="clientAddress"></div>
+  </div>
+  <div class="actions">
+   <button class="success" onclick="saveClient()">Save Client</button>
+   <button class="secondary" onclick="resetClientForm()">Clear</button>
+  </div>
+ </div>
+ <div class="card">
+  <div class="row">
+   <div class="field">
+    <label>Search Client</label>
+    <input id="clientSearch" oninput="renderClients()" placeholder="Name, PAN, GSTIN or Client ID">
+   </div>
+  </div>
+  <div id="clientTable"></div>
+ </div>
 </section>
 
-<section id="vouchers" class="page hidden">
-<div class="card">
-<div class="row"><h3 id="voucherHeading">Voucher Entry</h3><button class="secondary fit" onclick="newVoucher()">New Voucher</button></div>
-<input type="hidden" id="voucherEditId">
-<div class="grid2">
-<div><label>Voucher Date</label><input type="date" id="vDate"></div>
-<div><label>Voucher Type</label><select id="vType"><option>Journal</option><option>Payment</option><option>Receipt</option><option>Contra</option><option>Sales</option><option>Purchase</option></select></div>
-</div>
-<label style="margin-top:13px">Narration</label><input id="vNarration" placeholder="Voucher details">
-<div class="tablewrap" style="margin-top:15px">
-<table><thead><tr><th style="width:38%">Ledger Account</th><th>Debit (₹)</th><th>Credit (₹)</th><th></th></tr></thead>
-<tbody id="voucherLines"></tbody></table>
-</div>
-<div class="row" style="margin-top:10px">
-<button class="secondary fit" onclick="addVoucherLine()">+ Add Row</button>
-<div class="right"><b>Debit: <span id="debitTotal">₹0</span></b> &nbsp; <b>Credit: <span id="creditTotal">₹0</span></b></div>
-</div>
-<div style="margin-top:14px" class="row">
-<button onclick="saveVoucher()">Save Voucher</button>
-<button class="secondary" onclick="newVoucher()">Clear</button>
-</div>
-<small id="voucherMessage"></small>
-</div>
-<div class="card"><h3>Saved Vouchers</h3><div class="tablewrap" id="savedVouchers"></div></div>
+<section id="ledgers" class="page">
+ <h2>Ledger Master</h2>
+ <div class="card">
+  <h3>Create Ledger</h3>
+  <div class="row">
+   <div class="field"><label>Ledger Name *</label><input id="ledgerName" placeholder="Cash, Bank, Sales, Rent..."></div>
+   <div class="field"><label>Under Group</label>
+    <select id="ledgerGroup">
+     <option>Asset</option><option>Liability</option><option>Capital</option>
+     <option>Direct Income</option><option>Income</option>
+     <option>Direct Expense</option><option>Expense</option>
+    </select>
+   </div>
+   <div class="field"><label>Opening Balance</label><input type="number" id="opening" min="0" step="0.01" value="0"></div>
+   <div class="field"><label>Opening Side</label><select id="openingSide"><option>Dr</option><option>Cr</option></select></div>
+  </div>
+  <button class="success" onclick="createLedger()">＋ Create Ledger</button>
+ </div>
+ <div class="card"><h3>All Ledgers</h3><div id="ledgerList"></div></div>
 </section>
 
-<section id="daybook" class="page hidden"><div class="card"><h3>Day Book</h3><div id="daybookTable" class="tablewrap"></div></div></section>
-<section id="ledgerreport" class="page hidden">
-<div class="card"><h3>Account Ledger</h3><div class="row"><div><label>Select Ledger</label><select id="reportLedger" onchange="renderLedgerReport()"></select></div></div><div id="ledgerReportTable" class="tablewrap" style="margin-top:15px"></div></div>
+<section id="voucher" class="page">
+ <h2>Voucher Entry</h2>
+ <div class="card">
+  <div class="row">
+   <div class="field"><label>Voucher Type</label>
+    <select id="vType">
+     <option>Journal</option><option>Payment</option><option>Receipt</option>
+     <option>Contra</option><option>Purchase</option><option>Sales</option>
+     <option>Debit Note</option><option>Credit Note</option>
+    </select>
+   </div>
+   <div class="field"><label>Date</label><input type="date" id="vDate"></div>
+   <div class="field"><label>Voucher Number</label><input id="vNo" readonly></div>
+  </div>
+  <div class="field" style="margin-bottom:14px">
+   <label>Narration</label><input id="narration" placeholder="Transaction description">
+  </div>
+  <h3>Accounting Entries</h3>
+  <div class="entry-row entry-heading">
+   <div>Ledger</div><div>Debit (Dr)</div><div>Credit (Cr)</div><div></div>
+  </div>
+  <div id="entries"></div>
+  <div class="actions">
+   <button class="secondary" onclick="addEntry()">＋ Add Ledger Row</button>
+   <button class="secondary" onclick="page('calculator',document.querySelectorAll('.nav')[9])">Calculator</button>
+  </div>
+  <div class="totalbar" id="totals">Debit ₹0.00 | Credit ₹0.00 | Difference ₹0.00</div>
+  <div class="actions">
+   <button class="success" onclick="saveVoucher()">Save Voucher</button>
+   <button class="secondary" onclick="clearVoucher()">Clear</button>
+  </div>
+ </div>
 </section>
-<section id="trial" class="page hidden"><div class="card"><h3>Trial Balance</h3><div id="trialTable" class="tablewrap"></div></div></section>
-<section id="pl" class="page hidden"><div class="card"><h3>Profit & Loss Account</h3><div id="plTable" class="tablewrap"></div></div></section>
-<section id="balance" class="page hidden"><div class="card"><h3>Balance Sheet</h3><div id="balanceTable" class="tablewrap"></div></div></section>
-<section id="compare" class="page hidden"><div class="card"><h3>Financial Year Comparison</h3><div id="compareTable" class="tablewrap"></div></div></section>
 
-<section id="calculator" class="page hidden">
-<div class="card" style="max-width:380px"><h3>SAFS Calculator</h3>
-<div class="calc">
-<input id="calcDisplay" placeholder="0" readonly>
-<button onclick="calcClear()">C</button><button onclick="calcAdd('%')">%</button><button onclick="calcBack()">⌫</button><button onclick="calcAdd('/')">÷</button>
-<button onclick="calcAdd('7')">7</button><button onclick="calcAdd('8')">8</button><button onclick="calcAdd('9')">9</button><button onclick="calcAdd('*')">×</button>
-<button onclick="calcAdd('4')">4</button><button onclick="calcAdd('5')">5</button><button onclick="calcAdd('6')">6</button><button onclick="calcAdd('-')">−</button>
-<button onclick="calcAdd('1')">1</button><button onclick="calcAdd('2')">2</button><button onclick="calcAdd('3')">3</button><button onclick="calcAdd('+')">+</button>
-<button onclick="calcAdd('0')">0</button><button onclick="calcAdd('.')">.</button><button onclick="calcResult()" style="grid-column:span 2;background:var(--green)">=</button>
-</div></div></section>
+<section id="daybook" class="page">
+ <h2>Day Book</h2><div class="card"><div id="daybookTable"></div></div>
+</section>
 
-<section id="backup" class="page hidden">
-<div class="card"><h3>Backup & Restore</h3>
-<button onclick="backupAll()">Download Full JSON Backup</button>
-<label style="margin-top:18px">Restore Backup</label><input type="file" id="backupFile" accept=".json">
-<button class="green" style="margin-top:10px" onclick="restoreAll()">Restore JSON Backup</button>
-<hr style="border-color:var(--line);margin:20px 0">
-<h3>Export Current Client / Year</h3>
-<div class="row"><button onclick="exportExcel()">Export Excel</button><button onclick="exportPDF()">Export PDF</button><button onclick="exportWord()">Export Word</button></div>
-<small>Excel/PDF exports ke liye internet connection zaroori hai.</small>
-</div></section>
-</div>
+<section id="ledgerReport" class="page">
+ <h2>Account Ledger</h2>
+ <div class="card">
+  <div class="field"><label>Select Ledger</label><select id="reportLedger" onchange="renderLedgerReport()"></select></div>
+  <div id="ledgerReportTable" style="margin-top:14px"></div>
+ </div>
+</section>
+
+<section id="trial" class="page">
+ <h2>Trial Balance</h2><div class="card"><div id="trialTable"></div></div>
+</section>
+
+<section id="pl" class="page">
+ <h2>Profit & Loss</h2>
+ <div class="card">
+  <p class="muted">Income and expenses based on posted vouchers and opening balances. Review account groups before relying on statutory reports.</p>
+  <div id="plTable"></div>
+ </div>
+</section>
+
+<section id="balance" class="page">
+ <h2>Balance Sheet</h2>
+ <div class="card">
+  <p class="muted">Management summary; verify classifications and year-end adjustments with your accountant.</p>
+  <div id="balanceTable"></div>
+ </div>
+</section>
+
+<section id="calculator" class="page">
+ <h2>Accounting Calculator</h2>
+ <div class="card">
+  <div class="calc">
+   <div class="calc-display" id="display" aria-live="polite">0</div>
+   <div class="calc-grid">
+    <button class="clear" onclick="clearCalc()">AC</button>
+    <button onclick="calcInput('%')">%</button>
+    <button onclick="backCalc()">⌫</button>
+    <button class="op" onclick="calcInput('/')">÷</button>
+    <button onclick="calcInput('7')">7</button>
+    <button onclick="calcInput('8')">8</button>
+    <button onclick="calcInput('9')">9</button>
+    <button class="op" onclick="calcInput('*')">×</button>
+    <button onclick="calcInput('4')">4</button>
+    <button onclick="calcInput('5')">5</button>
+    <button onclick="calcInput('6')">6</button>
+    <button class="op" onclick="calcInput('-')">−</button>
+    <button onclick="calcInput('1')">1</button>
+    <button onclick="calcInput('2')">2</button>
+    <button onclick="calcInput('3')">3</button>
+    <button class="op" onclick="calcInput('+')">+</button>
+    <button onclick="calcInput('0')">0</button>
+    <button onclick="calcInput('.')">.</button>
+    <button onclick="calcInput('(')">(</button>
+    <button onclick="calcInput(')')">)</button>
+    <button class="equal" style="grid-column:span 4" onclick="calcResult()">=</button>
+   </div>
+  </div>
+ </div>
+</section>
+
+<section id="backup" class="page">
+ <h2>Export & Backup</h2>
+ <div class="card">
+  <h3>Export Current Financial Year</h3>
+  <div class="actions">
+   <button onclick="exportPDF()">PDF Export</button>
+   <button class="success" onclick="exportExcel()">Excel Export</button>
+   <button class="dark" onclick="exportWord()">Word Export</button>
+   <button class="secondary" onclick="window.print()">Print</button>
+  </div>
+ </div>
+ <div class="card">
+  <h3>Full Data Backup / Restore</h3>
+  <div class="actions">
+   <button onclick="backup()">Download JSON Backup</button>
+   <button class="secondary" onclick="document.getElementById('restore').click()">Restore Backup</button>
+   <input id="restore" type="file" accept=".json" hidden onchange="restoreBackup(event)">
+  </div>
+  <p class="muted">Backup mein sabhi clients, financial years, ledgers aur vouchers save honge. Data isi browser mein rehta hai; regular backup rakhein.</p>
+ </div>
+</section>
+
 </main>
 </div>
-
-<div id="clientModal" class="modal"><div class="modalbox">
-<h3 id="clientModalTitle">Add Client</h3><input type="hidden" id="clientId">
-<div class="grid2">
-<div><label>Client / Business Name *</label><input id="cName"></div>
-<div><label>Mobile</label><input id="cMobile"></div>
-<div><label>PAN</label><input id="cPan"></div>
-<div><label>GSTIN</label><input id="cGstin"></div>
-</div><label style="margin-top:10px">Address</label><textarea id="cAddress"></textarea>
-<div class="row" style="margin-top:14px"><button onclick="saveClient()">Save Client</button><button class="secondary" onclick="closeModal('clientModal')">Cancel</button></div>
-</div></div>
-
-<div id="ledgerModal" class="modal"><div class="modalbox">
-<h3 id="ledgerModalTitle">Add Ledger</h3><input type="hidden" id="ledgerId">
-<div class="grid2">
-<div><label>Ledger Name *</label><input id="lName"></div>
-<div><label>Group</label><select id="lGroup">
-<option>Capital Account</option><option>Loans (Liability)</option><option>Current Liabilities</option><option>Fixed Assets</option><option>Current Assets</option><option>Cash-in-Hand</option><option>Bank Accounts</option><option>Sundry Debtors</option><option>Sundry Creditors</option><option>Sales Accounts</option><option>Purchase Accounts</option><option>Direct Income</option><option>Indirect Income</option><option>Direct Expenses</option><option>Indirect Expenses</option>
-</select></div>
-</div>
-<div class="grid2" style="margin-top:10px">
-<div><label>Opening Balance (₹)</label><input type="number" id="lOpening" min="0" step=".01" value="0"></div>
-<div><label>Opening Balance Side</label><select id="lSide"><option>Dr</option><option>Cr</option></select></div>
-</div>
-<small>Opening balance selected financial year ke liye apply hoga.</small>
-<div class="row" style="margin-top:14px"><button onclick="saveLedger()">Save Ledger</button><button class="secondary" onclick="closeModal('ledgerModal')">Cancel</button></div>
-</div></div>
 
 <footer>© Copyright 2026 SAFS ASSOCIATE. All Rights Reserved.</footer>
 
 <script>
-const KEY="SAFS_ASSOCIATE_ACCOUNTING_V3";
-let db=loadDB(),clientId=null,yearId=null,page="dashboard";
+"use strict";
+
+const KEY="SAFS_ASSOCIATE_ACCOUNTING_V4";
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+const today=()=>{
+ const d=new Date();
+ return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10);
+};
+const money=n=>"₹"+Number(n||0).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2});
+const FYDEFAULT=["2024-25","2025-26","2026-27"];
+
+const DEFAULTS=[
+ ["Cash in Hand","Asset"],["Bank Account","Asset"],["Sundry Debtors","Asset"],
+ ["Furniture","Asset"],["Computer & Equipment","Asset"],["Input CGST","Asset"],
+ ["Input SGST","Asset"],["Input IGST","Asset"],["Sundry Creditors","Liability"],
+ ["Output CGST","Liability"],["Output SGST","Liability"],["Output IGST","Liability"],
+ ["Capital Account","Capital"],["Drawings","Capital"],["Sales Account","Direct Income"],
+ ["Service Income","Direct Income"],["Interest Received","Income"],
+ ["Purchase Account","Direct Expense"],["Tax Payment","Expense"],
+ ["Printing & Stationery","Expense"],["Salary","Expense"],["Rent","Expense"],
+ ["Electricity","Expense"],["Internet Expenses","Expense"],
+ ["Travelling Expenses","Expense"],["Bank Charges","Expense"],["Depreciation","Expense"]
+];
+
+function freshYear(name){return{id:uid(),name,vouchers:[]};}
+function freshClient(x){
+ return {
+  id:uid(),code:"CL-"+Math.random().toString(36).slice(2,7).toUpperCase(),
+  name:x.name,mobile:x.mobile,pan:x.pan,gstin:x.gstin,address:x.address,
+  ledgers:DEFAULTS.map(a=>({id:uid(),name:a[0],group:a[1],opening:{}})),
+  years:FYDEFAULT.map(freshYear)
+ };
+}
+
+function loadDB(){
+ try{
+  let d=JSON.parse(localStorage.getItem(KEY));
+  if(d&&Array.isArray(d.clients))return d;
+ }catch(e){}
+ return{clients:[]};
+}
+
+let db=loadDB();
+let clientId=localStorage.getItem(KEY+"_client")||"";
+let yearId=localStorage.getItem(KEY+"_year")||"";
+let calcExpr="0";
+
 const $=id=>document.getElementById(id);
-function loadDB(){try{return JSON.parse(localStorage.getItem(KEY))||{clients:[]}}catch(e){return {clients:[]}}}
-function persist(){localStorage.setItem(KEY,JSON.stringify(db))}
-function id(){return "S"+Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
-function fmt(n){return "₹"+Number(n||0).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2})}
-function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
-function client(){return db.clients.find(c=>c.id===clientId)}
-function book(){return client()?.years.find(y=>y.id===yearId)}
-function openModal(mid){$(mid).style.display="flex"}
-function closeModal(mid){$(mid).style.display="none"}
-function go(p,btn){
- page=p;document.querySelectorAll(".page").forEach(x=>x.classList.add("hidden"));
- $(p)?.classList.remove("hidden");
- document.querySelectorAll(".nav").forEach(x=>x.classList.toggle("active",x.dataset.page===p));
- renderPage();
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({
+ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+}[c]));
+
+function persist(){
+ localStorage.setItem(KEY,JSON.stringify(db));
+ localStorage.setItem(KEY+"_client",clientId);
+ localStorage.setItem(KEY+"_year",yearId);
 }
-function renderClientList(){
- let q=$("clientSearch").value.toLowerCase();
- let list=db.clients.filter(c=>(c.name+" "+c.pan+" "+c.gstin).toLowerCase().includes(q));
- $("clientList").innerHTML=list.map(c=>`<div class="client ${c.id===clientId?'active':''}" onclick="selectClient('${c.id}')"><b>${esc(c.name)}</b><br><small>${esc(c.code)} · ${c.years.length} year sheets</small></div>`).join("")||'<p class="muted">No client found.</p>';
+function client(){return db.clients.find(x=>x.id===clientId)||null;}
+function year(){return client()?.years.find(x=>x.id===yearId)||null;}
+
+function ensureSelection(){
+ if(!client())clientId=db.clients[0]?.id||"";
+ if(client()&&!year())yearId=client().years[0]?.id||"";
+ if(!client())yearId="";
 }
-function selectClient(cid){
- clientId=cid;let c=client();if(!c)return;
- if(!c.years.length){c.years.push({id:id(),name:"2026-27",vouchers:[]});persist()}
- yearId=c.years[0].id;renderWork();
+
+function selectClient(id){
+ clientId=id;
+ yearId=client()?.years[0]?.id||"";
+ persist();renderAll();
 }
-function selectYear(yid){yearId=yid;renderWork()}
-function renderWork(){
- let c=client();if(!c)return;
- $("welcome").classList.add("hidden");$("workarea").classList.remove("hidden");
- $("clientHeading").textContent=c.name;
- $("clientDetails").textContent=[c.code,c.mobile&&"Mobile "+c.mobile,c.pan&&"PAN "+c.pan,c.gstin&&"GSTIN "+c.gstin].filter(Boolean).join(" | ");
- $("yearTabs").innerHTML=c.years.map(y=>`<button class="yearbtn ${y.id===yearId?'active':''}" onclick="selectYear('${y.id}')">FY ${esc(y.name)}</button>`).join("");
- $("yearInfo").textContent="Active sheet: FY "+(book()?.name||"");
- renderClientList();renderPage();
+function selectYear(id){yearId=id;persist();renderAll();}
+
+function page(id,btn){
+ document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));
+ $(id).classList.add("active");
+ document.querySelectorAll(".nav").forEach(x=>x.classList.remove("active"));
+ if(btn)btn.classList.add("active");
+ renderAll();
 }
-function renderPage(){
- if(!client())return;
- if(page==="dashboard")renderDashboard();
- if(page==="ledgers")renderLedgers();
- if(page==="vouchers"){renderSavedVouchers();if(!$("voucherLines").children.length)newVoucher()}
- if(page==="daybook")renderDaybook();
- if(page==="ledgerreport")setupLedgerSelect();
- if(page==="trial")renderTrial();
- if(page==="pl")renderPL();
- if(page==="balance")renderBalance();
- if(page==="compare")renderCompare();
+
+function renderSelectors(){
+ ensureSelection();
+ $("clientSelect").innerHTML='<option value="">Select Client</option>'+
+ db.clients.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join("");
+ $("clientSelect").value=clientId;
+ $("yearSelect").innerHTML=client()
+  ?client().years.map(y=>`<option value="${y.id}">${esc(y.name)}</option>`).join("")
+  :'<option value="">Select Financial Year</option>';
+ $("yearSelect").value=yearId;
+ $("activeClientLabel").textContent=client()
+  ?client().name+" | "+(year()?.name||""):"No client selected";
 }
-function openClientModal(c){
- $("clientId").value=c?.id||"";
- $("clientModalTitle").textContent=c?"Edit Client":"Add New Client";
- $("cName").value=c?.name||"";$("cMobile").value=c?.mobile||"";
- $("cPan").value=c?.pan||"";$("cGstin").value=c?.gstin||"";$("cAddress").value=c?.address||"";
- openModal("clientModal");
-}
-function editClient(){if(client())openClientModal(client())}
+
 function saveClient(){
- let name=$("cName").value.trim();if(!name){alert("Client name required");return}
- let cid=$("clientId").value;
- let fields={name,mobile:$("cMobile").value.trim(),pan:$("cPan").value.trim().toUpperCase(),gstin:$("cGstin").value.trim().toUpperCase(),address:$("cAddress").value.trim()};
- if(cid)Object.assign(db.clients.find(c=>c.id===cid),fields);
- else{
-  let c={id:id(),code:"SAFS-"+String(db.clients.length+1).padStart(4,"0"),...fields,ledgers:[],years:[{id:id(),name:"2026-27",vouchers:[]}]};
+ let name=$("clientName").value.trim();
+ if(!name){alert("Client name required");return;}
+ let id=$("editClientId").value;
+ let data={
+  name,mobile:$("clientMobile").value.trim(),
+  pan:$("clientPan").value.trim().toUpperCase(),
+  gstin:$("clientGstin").value.trim().toUpperCase(),
+  address:$("clientAddress").value.trim()
+ };
+ if(id){
+  Object.assign(db.clients.find(c=>c.id===id),data);
+ }else{
+  let c=freshClient(data);
   db.clients.push(c);clientId=c.id;yearId=c.years[0].id;
  }
- persist();closeModal("clientModal");selectClient(clientId);
+ resetClientForm();persist();renderAll();alert("Client saved successfully");
 }
-function deleteClient(){
- let c=client();if(!c)return;
- if(!confirm("Client aur uske sabhi years, ledgers aur vouchers delete honge. Pehle backup lein. Continue?"))return;
- db.clients=db.clients.filter(x=>x.id!==clientId);clientId=null;yearId=null;persist();
- $("workarea").classList.add("hidden");$("welcome").classList.remove("hidden");renderClientList();
+
+function resetClientForm(){
+ $("editClientId").value="";
+ ["clientName","clientMobile","clientPan","clientGstin","clientAddress"].forEach(id=>$(id).value="");
 }
+
+function editClient(id){
+ let c=db.clients.find(x=>x.id===id);if(!c)return;
+ $("editClientId").value=id;
+ $("clientName").value=c.name;
+ $("clientMobile").value=c.mobile||"";
+ $("clientPan").value=c.pan||"";
+ $("clientGstin").value=c.gstin||"";
+ $("clientAddress").value=c.address||"";
+ page("clients",document.querySelectorAll(".nav")[1]);
+}
+
+function deleteClient(id){
+ let c=db.clients.find(x=>x.id===id);
+ if(!c||!confirm("Delete client and all its books/vouchers? Take backup first if needed."))return;
+ db.clients=db.clients.filter(x=>x.id!==id);
+ if(clientId===id){clientId="";yearId="";}
+ persist();renderAll();
+}
+
 function addYear(){
- let c=client();let n=prompt("Naya Financial Year (example 2027-28):");if(!n)return;
- n=n.trim();if(!/^\d{4}-\d{2}$/.test(n)){alert("Format 2027-28 jaisa hona chahiye.");return}
- if(c.years.some(y=>y.name===n)){alert("Ye year already added hai.");return}
- let y={id:id(),name:n,vouchers:[]};c.years.push(y);c.years.sort((a,b)=>a.name.localeCompare(b.name));
- yearId=y.id;persist();renderWork();
+ if(!client()){alert("Pehle client select karein");return;}
+ let name=prompt("Financial Year name (example: 2027-28)");
+ if(!name)return;
+ name=name.trim();
+ if(client().years.some(y=>y.name===name)){alert("Financial year already exists");return;}
+ let y=freshYear(name);
+ client().years.push(y);yearId=y.id;
+ persist();renderAll();
 }
-function openLedgerModal(l){
- $("ledgerId").value=l?.id||"";$("ledgerModalTitle").textContent=l?"Edit Ledger":"Add Ledger";
- $("lName").value=l?.name||"";$("lGroup").value=l?.group||"Indirect Expenses";
- $("lOpening").value=l?.opening?.[yearId]?.amount??0;$("lSide").value=l?.opening?.[yearId]?.side||"Dr";
- openModal("ledgerModal");
+
+function options(){
+ return '<option value="">Select Ledger</option>'+
+ (client()?.ledgers||[]).map(l=>`<option value="${l.id}">${esc(l.name)}</option>`).join("");
 }
-function saveLedger(){
- let c=client(),lid=$("ledgerId").value,name=$("lName").value.trim();
- if(!name){alert("Ledger name required");return}
- if(c.ledgers.some(l=>l.name.toLowerCase()===name.toLowerCase()&&l.id!==lid)){alert("Ledger already exists.");return}
- let l=lid?c.ledgers.find(x=>x.id===lid):{id:id(),opening:{}};
- l.name=name;l.group=$("lGroup").value;
- l.opening=l.opening||{};l.opening[yearId]={amount:Number($("lOpening").value)||0,side:$("lSide").value};
- if(!lid)c.ledgers.push(l);
- persist();closeModal("ledgerModal");renderPage();
+
+function createLedger(){
+ if(!client()){alert("Select client first");return;}
+ let name=$("ledgerName").value.trim();
+ let opening=Number($("opening").value)||0;
+ if(!name||opening<0){alert("Valid ledger name/opening balance enter karein");return;}
+ if(client().ledgers.some(l=>l.name.toLowerCase()===name.toLowerCase())){
+  alert("Ledger already exists");return;
+ }
+ let l={id:uid(),name,group:$("ledgerGroup").value,opening:{}};
+ l.opening[yearId]={amount:opening,side:$("openingSide").value};
+ client().ledgers.push(l);
+ $("ledgerName").value="";$("opening").value=0;
+ persist();renderAll();
 }
-function renderLedgers(){
- let c=client();
- $("ledgerTable").innerHTML=c.ledgers.length?`<table><thead><tr><th>Ledger Name</th><th>Group</th><th>Opening (This FY)</th><th>Action</th></tr></thead><tbody>${c.ledgers.map(l=>{
- let o=l.opening?.[yearId]||{amount:0,side:"Dr"};
- return `<tr><td>${esc(l.name)}</td><td>${esc(l.group)}</td><td>${fmt(o.amount)} ${o.side}</td><td><button class="small secondary" onclick="openLedgerModal(client().ledgers.find(x=>x.id==='${l.id}'))">Edit</button> <button class="small red" onclick="deleteLedger('${l.id}')">Delete</button></td></tr>`;
- }).join("")}</tbody></table>`:'<p class="muted">No ledgers added. Add ledger to start.</p>';
+
+function addEntry(data={}){
+ let d=document.createElement("div");
+ d.className="entry-row";
+ d.innerHTML=`
+ <select class="entry-ledger">${options()}</select>
+ <input class="entry-dr" type="number" min="0" step="0.01" placeholder="Debit">
+ <input class="entry-cr" type="number" min="0" step="0.01" placeholder="Credit">
+ <button class="danger" type="button">×</button>`;
+ d.querySelector(".entry-ledger").value=data.ledgerId||"";
+ d.querySelector(".entry-dr").value=data.dr||"";
+ d.querySelector(".entry-cr").value=data.cr||"";
+ d.querySelectorAll("input").forEach(x=>x.addEventListener("input",calculate));
+ d.querySelector("button").onclick=()=>{d.remove();calculate();};
+ $("entries").appendChild(d);calculate();
 }
-function deleteLedger(lid){
- let c=client();
- if(c.years.some(y=>y.vouchers.some(v=>v.lines.some(x=>x.ledgerId===lid)))){alert("Is ledger mein voucher entries hain. Pehle vouchers edit karein.");return}
- if(!confirm("Delete this ledger?"))return;
- c.ledgers=c.ledgers.filter(l=>l.id!==lid);persist();renderLedgers();
+
+function linesRead(){
+ return [...document.querySelectorAll("#entries .entry-row")].map(r=>({
+  ledgerId:r.querySelector(".entry-ledger").value,
+  dr:Number(r.querySelector(".entry-dr").value)||0,
+  cr:Number(r.querySelector(".entry-cr").value)||0
+ }));
 }
-function addVoucherLine(line={}){
- let c=client(),tr=document.createElement("tr");
- tr.innerHTML=`<td><select class="vledger"><option value="">Select Ledger</option>${c.ledgers.map(l=>`<option value="${l.id}">${esc(l.name)}</option>`).join("")}</select></td>
- <td><input class="vdr" type="number" min="0" step=".01" placeholder="0.00"></td>
- <td><input class="vcr" type="number" min="0" step=".01" placeholder="0.00"></td>
- <td><button class="small red" type="button" onclick="this.closest('tr').remove();calcVoucherTotals()">×</button></td>`;
- $("voucherLines").appendChild(tr);
- tr.querySelector(".vledger").value=line.ledgerId||"";
- tr.querySelector(".vdr").value=line.dr||"";
- tr.querySelector(".vcr").value=line.cr||"";
- tr.querySelectorAll("input,select").forEach(x=>x.addEventListener("input",calcVoucherTotals));
- calcVoucherTotals();
-}
-function newVoucher(){
- $("voucherEditId").value="";$("voucherHeading").textContent="Voucher Entry";
- $("vDate").value=new Date().toISOString().slice(0,10);$("vType").value="Journal";$("vNarration").value="";
- $("voucherLines").innerHTML="";addVoucherLine();addVoucherLine();$("voucherMessage").textContent="";
-}
-function calcVoucherTotals(){
- let dr=0,cr=0;
- document.querySelectorAll("#voucherLines tr").forEach(tr=>{
- dr+=Number(tr.querySelector(".vdr").value)||0;cr+=Number(tr.querySelector(".vcr").value)||0;
+
+function calculate(){
+ let lines=linesRead(),dr=0,cr=0,valid=true;
+ lines.forEach(x=>{
+  if(x.dr<0||x.cr<0||(x.dr>0&&x.cr>0))valid=false;
+  dr+=x.dr;cr+=x.cr;
  });
- $("debitTotal").textContent=fmt(dr);$("creditTotal").textContent=fmt(cr);
- return {dr,cr};
+ let diff=dr-cr;
+ $("totals").textContent=
+ `Debit: ${money(dr)} | Credit: ${money(cr)} | Difference: ${money(Math.abs(diff))}`+
+ (valid?"":" | Check entries");
+ return{dr,cr,valid,diff,lines};
 }
+
+function clearVoucher(){
+ $("entries").innerHTML="";
+ $("narration").value="";
+ $("vDate").value=today();
+ $("vNo").value=nextVoucherNo();
+ addEntry();addEntry();
+}
+
+function nextVoucherNo(){
+ return "V-"+String((year()?.vouchers.length||0)+1).padStart(4,"0");
+}
+
 function saveVoucher(){
- let b=book();if(!b)return;
- let lines=[];document.querySelectorAll("#voucherLines tr").forEach(tr=>{
- let ledgerId=tr.querySelector(".vledger").value,dr=Number(tr.querySelector(".vdr").value)||0,cr=Number(tr.querySelector(".vcr").value)||0;
- if(ledgerId&&(dr||cr))lines.push({ledgerId,dr,cr});
+ if(!client()||!year()){alert("Client aur financial year select karein");return;}
+ let t=calculate();
+ if(!t.valid||
+    t.lines.some(x=>!x.ledgerId&&(x.dr||x.cr))||
+    t.lines.filter(x=>x.ledgerId&&(x.dr||x.cr)).length<2||
+    t.dr<=0||Math.abs(t.diff)>.005||
+    t.lines.some(x=>x.ledgerId&&!x.dr&&!x.cr)){
+  alert("Har amount ke liye ledger select karein. Dr aur Cr equal hone chahiye; minimum 2 entries.");
+  return;
+ }
+ year().vouchers.push({
+  id:uid(),number:$("vNo").value||nextVoucherNo(),
+  date:$("vDate").value||today(),type:$("vType").value,
+  narration:$("narration").value.trim(),
+  lines:t.lines.filter(x=>x.ledgerId&&(x.dr||x.cr))
  });
- let {dr,cr}=calcVoucherTotals();
- if(lines.length<2){alert("Kam se kam 2 ledger rows add karein.");return}
- if(lines.some(x=>x.dr>0&&x.cr>0)){alert("Ek row mein Debit aur Credit dono enter na karein.");return}
- if(Math.abs(dr-cr)>.005){alert("Debit aur Credit equal hone chahiye. Difference: "+fmt(Math.abs(dr-cr)));return}
- if(dr<=0){alert("Voucher amount enter karein.");return}
- let obj={id:$("voucherEditId").value||id(),date:$("vDate").value,type:$("vType").value,narration:$("vNarration").value.trim(),lines};
- let ix=b.vouchers.findIndex(v=>v.id===obj.id);if(ix>=0)b.vouchers[ix]=obj;else b.vouchers.push(obj);
- persist();alert("Voucher saved successfully.");newVoucher();renderPage();
+ persist();alert("Voucher saved");clearVoucher();renderAll();
 }
-function editVoucher(vid){
- let v=book().vouchers.find(x=>x.id===vid);if(!v)return;
- page="vouchers";go("vouchers");
- $("voucherEditId").value=v.id;$("voucherHeading").textContent="Edit Voucher";
- $("vDate").value=v.date;$("vType").value=v.type;$("vNarration").value=v.narration||"";
- $("voucherLines").innerHTML="";v.lines.forEach(x=>addVoucherLine(x));renderSavedVouchers();
-}
-function deleteVoucher(vid){
- if(!confirm("Delete this voucher?"))return;
- let b=book();b.vouchers=b.vouchers.filter(v=>v.id!==vid);persist();renderPage();
-}
-function voucherTable(list){
- if(!list.length)return '<p class="muted">No vouchers found.</p>';
- return `<table><thead><tr><th>Date</th><th>Type</th><th>Particulars</th><th>Debit</th><th>Credit</th><th>Action</th></tr></thead><tbody>${list.map(v=>{
- let names=v.lines.map(x=>client().ledgers.find(l=>l.id===x.ledgerId)?.name||"Unknown").join(", ");
- return `<tr><td>${esc(v.date)}</td><td>${esc(v.type)}</td><td>${esc(names)}<br><small>${esc(v.narration||"")}</small></td><td>${fmt(v.lines.reduce((s,x)=>s+x.dr,0))}</td><td>${fmt(v.lines.reduce((s,x)=>s+x.cr,0))}</td><td><button class="small secondary" onclick="editVoucher('${v.id}')">Edit</button> <button class="small red" onclick="deleteVoucher('${v.id}')">Delete</button></td></tr>`;
- }).join("")}</tbody></table>`;
-}
-function renderSavedVouchers(){$("savedVouchers").innerHTML=voucherTable(book().vouchers.slice().sort((a,b)=>b.date.localeCompare(a.date)))}
-function movements(){
- let c=client(),b=book(),map={};
- c.ledgers.forEach(l=>{let o=l.opening?.[yearId]||{amount:0,side:"Dr"};map[l.id]={ledger:l,dr:o.side==="Dr"?o.amount:0,cr:o.side==="Cr"?o.amount:0}});
- b.vouchers.forEach(v=>v.lines.forEach(x=>{
- if(!map[x.ledgerId])return;map[x.ledgerId].dr+=x.dr;map[x.ledgerId].cr+=x.cr;
+
+function net(l){
+ let ob=l.opening?.[yearId]||{amount:0,side:"Dr"};
+ let n=(ob.side==="Dr"?1:-1)*Number(ob.amount||0);
+ (year()?.vouchers||[]).forEach(v=>v.lines.forEach(e=>{
+  if(e.ledgerId===l.id)n+=e.dr-e.cr;
  }));
- return map;
+ return n;
 }
+
+function table(head,rows){
+ if(!rows.length)return'<div class="empty">No records available.</div>';
+ return `<div class="table-wrap"><table><thead><tr>${head.map(x=>`<th>${x}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>"<tr>"+r.map(x=>`<td>${x??""}</td>`).join("")+"</tr>").join("")}</tbody></table></div>`;
+}
+
+function renderClients(){
+ let q=$("clientSearch").value.toLowerCase();
+ $("clientTable").innerHTML=table(
+ ["Client ID","Client","Mobile","PAN","GSTIN","Actions"],
+ db.clients.filter(c=>[c.code,c.name,c.mobile,c.pan,c.gstin].join(" ").toLowerCase().includes(q))
+ .map(c=>[
+  esc(c.code),esc(c.name),esc(c.mobile),esc(c.pan),esc(c.gstin),
+  `<button class="secondary" onclick="selectClient('${c.id}')">Open</button>
+   <button onclick="editClient('${c.id}')">Edit</button>
+   <button class="danger" onclick="deleteClient('${c.id}')">Delete</button>`
+ ])
+ );
+}
+
+function renderLedgers(){
+ if(!client()){$("ledgerList").innerHTML='<div class="empty">Select client first.</div>';return;}
+ $("ledgerList").innerHTML=table(
+ ["Ledger","Group","Opening","Current Balance"],
+ client().ledgers.map(l=>{
+  let o=l.opening?.[yearId]||{amount:0,side:"Dr"},n=net(l);
+  return[esc(l.name),esc(l.group),money(o.amount)+" "+o.side,
+   money(Math.abs(n))+(n>=0?" Dr":" Cr")];
+ })
+ );
+}
+
 function renderDashboard(){
- let b=book(),m=movements(),income=0,expense=0;
- Object.values(m).forEach(x=>{
- let net=x.cr-x.dr;
- if(["Sales Accounts","Direct Income","Indirect Income"].includes(x.ledger.group))income+=net;
- if(["Purchase Accounts","Direct Expenses","Indirect Expenses"].includes(x.ledger.group))expense+=x.dr-x.cr;
- });
- $("dashIncome").textContent=fmt(income);$("dashExpense").textContent=fmt(expense);
- $("dashProfit").textContent=fmt(income-expense);$("dashCount").textContent=b.vouchers.length;
- $("recentVouchers").innerHTML=voucherTable(b.vouchers.slice().sort((a,b)=>b.date.localeCompare(a.date)).slice(0,8));
+ let v=year()?.vouchers||[],dr=0,cr=0;
+ v.forEach(x=>x.lines.forEach(l=>{dr+=l.dr;cr+=l.cr;}));
+ $("needClient").style.display=client()?"none":"block";
+ $("statClient").textContent=client()?.name||"—";
+ $("statYear").textContent=year()?.name||"—";
+ $("statV").textContent=v.length;
+ $("statL").textContent=client()?.ledgers.length||0;
+ $("statD").textContent=money(dr);$("statC").textContent=money(cr);
+ $("recent").innerHTML=table(
+ ["Date","Voucher","Type","Narration","Amount"],
+ [...v].reverse().slice(0,8).map(x=>[
+  x.date,esc(x.number),esc(x.type),esc(x.narration),
+  money(x.lines.reduce((s,e)=>s+e.dr,0))
+ ])
+ );
 }
-function renderDaybook(){$("daybookTable").innerHTML=voucherTable(book().vouchers.slice().sort((a,b)=>a.date.localeCompare(b.date)))}
-function setupLedgerSelect(){
- $("reportLedger").innerHTML=client().ledgers.map(l=>`<option value="${l.id}">${esc(l.name)}</option>`).join("");
- renderLedgerReport();
+
+function renderDaybook(){
+ if(!client()){$("daybookTable").innerHTML="Select client first";return;}
+ $("daybookTable").innerHTML=table(
+ ["Date","Voucher","Type","Ledger","Narration","Debit","Credit"],
+ (year()?.vouchers||[]).slice().sort((a,b)=>a.date.localeCompare(b.date))
+ .flatMap(v=>v.lines.map(e=>[
+  v.date,esc(v.number),esc(v.type),
+  esc(client().ledgers.find(l=>l.id===e.ledgerId)?.name||"Unknown"),
+  esc(v.narration),e.dr?money(e.dr):"-",e.cr?money(e.cr):"-"
+ ]))
+ );
 }
+
 function renderLedgerReport(){
- let lid=$("reportLedger").value;if(!lid){$("ledgerReportTable").innerHTML="Add ledgers first.";return}
- let l=client().ledgers.find(x=>x.id===lid),o=l.opening?.[yearId]||{amount:0,side:"Dr"};
- let dr=o.side==="Dr"?o.amount:0,cr=o.side==="Cr"?o.amount:0,rows=[];
- book().vouchers.slice().sort((a,b)=>a.date.localeCompare(b.date)).forEach(v=>v.lines.forEach(x=>{
- if(x.ledgerId===lid){dr+=x.dr;cr+=x.cr;rows.push({date:v.date,type:v.type,part:v.narration,dr:x.dr,cr:x.cr})}
- }));
- let net=dr-cr;
- $("ledgerReportTable").innerHTML=`<h3>${esc(l.name)} · Opening ${fmt(o.amount)} ${o.side}</h3><table><thead><tr><th>Date</th><th>Type</th><th>Narration</th><th>Debit</th><th>Credit</th></tr></thead><tbody>${rows.map(x=>`<tr><td>${esc(x.date)}</td><td>${esc(x.type)}</td><td>${esc(x.part)}</td><td>${fmt(x.dr)}</td><td>${fmt(x.cr)}</td></tr>`).join("")}</tbody></table><p><b>Closing Balance: ${fmt(Math.abs(net))} ${net>=0?"Dr":"Cr"}</b></p>`;
+ if(!client()){$("ledgerReportTable").innerHTML="Select client first";return;}
+ let el=$("reportLedger"),old=el.value;
+ el.innerHTML=options();
+ if(client().ledgers.some(l=>l.id===old))el.value=old;
+ if(!el.value)el.value=client().ledgers[0]?.id||"";
+ let l=client().ledgers.find(x=>x.id===el.value);
+ if(!l){$("ledgerReportTable").innerHTML="";return;}
+ let ob=l.opening?.[yearId]||{amount:0,side:"Dr"};
+ let n=(ob.side==="Cr"?-1:1)*Number(ob.amount||0);
+ let rows=[["—","Opening Balance",n>=0?money(n):"-",n<0?money(-n):"-",money(Math.abs(n))+(n>=0?" Dr":" Cr")]];
+ let tx=[];
+ (year()?.vouchers||[]).forEach(v=>v.lines.filter(e=>e.ledgerId===l.id).forEach(e=>tx.push({v,e})));
+ tx.sort((a,b)=>a.v.date.localeCompare(b.v.date));
+ tx.forEach(({v,e})=>{
+  n+=e.dr-e.cr;
+  rows.push([v.date,esc(v.number+" "+v.narration),e.dr?money(e.dr):"-",e.cr?money(e.cr):"-",money(Math.abs(n))+(n>=0?" Dr":" Cr")]);
+ });
+ $("ledgerReportTable").innerHTML=table(["Date","Particulars","Debit","Credit","Balance"],rows);
 }
+
 function renderTrial(){
- let m=movements(),rows=Object.values(m).filter(x=>x.dr||x.cr);
- $("trialTable").innerHTML=`<table><thead><tr><th>Ledger</th><th>Debit Balance</th><th>Credit Balance</th></tr></thead><tbody>${rows.map(x=>{let n=x.dr-x.cr;return `<tr><td>${esc(x.ledger.name)}</td><td>${n>0?fmt(n):"—"}</td><td>${n<0?fmt(-n):"—"}</td></tr>`}).join("")}</tbody><tfoot><tr><th>Total</th><th>${fmt(rows.reduce((s,x)=>s+Math.max(0,x.dr-x.cr),0))}</th><th>${fmt(rows.reduce((s,x)=>s+Math.max(0,x.cr-x.dr),0))}</th></tr></tfoot></table>`;
-}
-function pnlValues(){
- let m=movements(),inc=[],exp=[];
- Object.values(m).forEach(x=>{
- let g=x.ledger.group,n=x.cr-x.dr;
- if(["Sales Accounts","Direct Income","Indirect Income"].includes(g)&&n)inc.push({name:x.ledger.name,amount:n});
- if(["Purchase Accounts","Direct Expenses","Indirect Expenses"].includes(g)&&-n)exp.push({name:x.ledger.name,amount:-n});
+ if(!client()){$("trialTable").innerHTML="Select client first";return;}
+ let rows=client().ledgers.map(l=>{
+  let n=net(l);return[esc(l.name),n>0?money(n):"-",n<0?money(-n):"-"];
  });
- return {inc,exp,income:inc.reduce((s,x)=>s+x.amount,0),expense:exp.reduce((s,x)=>s+x.amount,0)};
+ let d=client().ledgers.reduce((s,l)=>s+Math.max(0,net(l)),0);
+ let c=client().ledgers.reduce((s,l)=>s+Math.max(0,-net(l)),0);
+ rows.push(["TOTAL",money(d),money(c)]);
+ $("trialTable").innerHTML=table(["Account","Debit Balance","Credit Balance"],rows);
 }
+
 function renderPL(){
- let p=pnlValues(),profit=p.income-p.expense;
- $("plTable").innerHTML=`<div class="grid2"><div><h3>Income</h3>${p.inc.map(x=>`<p>${esc(x.name)} <span style="float:right">${fmt(x.amount)}</span></p>`).join("")}<hr><b>Total Income <span style="float:right">${fmt(p.income)}</span></b></div><div><h3>Expenses</h3>${p.exp.map(x=>`<p>${esc(x.name)} <span style="float:right">${fmt(x.amount)}</span></p>`).join("")}<hr><b>Total Expenses <span style="float:right">${fmt(p.expense)}</span></b></div></div><hr><h3>Net ${profit>=0?"Profit":"Loss"}: ${fmt(Math.abs(profit))}</h3>`;
+ if(!client()){$("plTable").innerHTML="Select client first";return;}
+ let inc=client().ledgers.filter(l=>["Income","Direct Income"].includes(l.group));
+ let exp=client().ledgers.filter(l=>["Expense","Direct Expense"].includes(l.group));
+ let income=inc.reduce((s,l)=>s-net(l),0);
+ let expenses=exp.reduce((s,l)=>s+net(l),0);
+ $("plTable").innerHTML=table(["Particulars","Amount"],[
+  ...inc.map(l=>[esc(l.name),money(Math.max(0,-net(l)))]),
+  ["TOTAL INCOME",money(income)],
+  ...exp.map(l=>[esc(l.name),money(Math.max(0,net(l)))]),
+  ["TOTAL EXPENSES",money(expenses)],
+  ["NET PROFIT / (LOSS)",money(income-expenses)]
+ ]);
 }
+
 function renderBalance(){
- let m=movements(),p=pnlValues(),assets=[],liabs=[];
- Object.values(m).forEach(x=>{
- let g=x.ledger.group,n=x.dr-x.cr;
- if(["Fixed Assets","Current Assets","Cash-in-Hand","Bank Accounts","Sundry Debtors"].includes(g)){if(n)assets.push({name:x.ledger.name,amount:n})}
- else if(["Capital Account","Loans (Liability)","Current Liabilities","Sundry Creditors"].includes(g)){if(-n)liabs.push({name:x.ledger.name,amount:-n})}
+ if(!client()){$("balanceTable").innerHTML="Select client first";return;}
+ let rows=[];
+ ["Asset","Liability","Capital"].forEach(g=>{
+  rows.push(["<b>"+g.toUpperCase()+"</b>",""]);
+  client().ledgers.filter(l=>l.group===g).forEach(l=>{
+   let n=net(l);rows.push([esc(l.name),money(Math.abs(n))+(n>=0?" Dr":" Cr")]);
+  });
  });
- let profit=p.income-p.expense;if(profit)liabs.push({name:"Current Year Profit / Loss",amount:profit});
- let totalA=assets.reduce((s,x)=>s+x.amount,0),totalL=liabs.reduce((s,x)=>s+x.amount,0);
- $("balanceTable").innerHTML=`<div class="grid2"><div><h3>Liabilities</h3>${liabs.map(x=>`<p>${esc(x.name)} <span style="float:right">${fmt(x.amount)}</span></p>`).join("")}<hr><b>Total ${fmt(totalL)}</b></div><div><h3>Assets</h3>${assets.map(x=>`<p>${esc(x.name)} <span style="float:right">${fmt(x.amount)}</span></p>`).join("")}<hr><b>Total ${fmt(totalA)}</b></div></div><p class="muted small">Balance Sheet presentation ledger groups aur entered opening balances par depend karti hai. Difference: ${fmt(totalA-totalL)}</p>`;
+ let inc=client().ledgers.filter(l=>["Income","Direct Income"].includes(l.group)).reduce((s,l)=>s-net(l),0);
+ let exp=client().ledgers.filter(l=>["Expense","Direct Expense"].includes(l.group)).reduce((s,l)=>s+net(l),0);
+ rows.push(["Current Period Profit / (Loss)",money(inc-exp)]);
+ $("balanceTable").innerHTML=table(["Particulars","Balance"],rows);
 }
-function renderCompare(){
- let c=client();
- $("compareTable").innerHTML=`<table><thead><tr><th>Financial Year Sheet</th><th>Income</th><th>Expenses</th><th>Profit / Loss</th><th>Vouchers</th><th>Open</th></tr></thead><tbody>${c.years.map(y=>{
- let old=yearId;yearId=y.id;let p=pnlValues();yearId=old;
- return `<tr><td>FY ${esc(y.name)}</td><td>${fmt(p.income)}</td><td>${fmt(p.expense)}</td><td>${fmt(p.income-p.expense)}</td><td>${y.vouchers.length}</td><td><button class="small" onclick="selectYear('${y.id}')">Open Sheet</button></td></tr>`;
- }).join("")}</tbody></table>`;
+
+function renderAll(){
+ renderSelectors();renderClients();renderLedgers();renderDashboard();
+ renderDaybook();renderLedgerReport();renderTrial();renderPL();renderBalance();
 }
-function backupAll(){
- let blob=new Blob([JSON.stringify(db,null,2)],{type:"application/json"}),a=document.createElement("a");
- a.href=URL.createObjectURL(blob);a.download="SAFS-ASSOCIATE-Backup.json";a.click();URL.revokeObjectURL(a.href);
+
+/* Calculator: safe parser, no eval or Function */
+function calcInput(x){
+ if(calcExpr==="Error")calcExpr="0";
+ if(calcExpr==="0"&&/[0-9.]/.test(x))calcExpr=x;
+ else calcExpr+=x;
+ $("display").textContent=calcExpr;
 }
-function restoreAll(){
- let f=$("backupFile").files[0];if(!f){alert("Select backup JSON file.");return}
- let r=new FileReader();r.onload=()=>{
- try{let d=JSON.parse(r.result);if(!Array.isArray(d.clients))throw 0;
- if(!confirm("Current data replace ho jayega. Continue?"))return;
- db=d;persist();clientId=null;yearId=null;$("workarea").classList.add("hidden");$("welcome").classList.remove("hidden");renderClientList();alert("Backup restored.");
- }catch(e){alert("Invalid backup file.")}};
+function clearCalc(){calcExpr="0";$("display").textContent=calcExpr;}
+function backCalc(){calcExpr=calcExpr.slice(0,-1)||"0";$("display").textContent=calcExpr;}
+
+function evaluateMath(s){
+ let t=s.match(/\d+(?:\.\d+)?|[()+\-*/%]/g);
+ if(!t||t.join("")!==s.replace(/\s/g,""))throw Error("Invalid");
+ let i=0;
+ function expr(){
+  let v=term();
+  while(t[i]==="+"||t[i]==="-"){
+   let op=t[i++],b=term();v=op==="+"?v+b:v-b;
+  }
+  return v;
+ }
+ function term(){
+  let v=factor();
+  while(t[i]==="*"||t[i]==="/"){
+   let op=t[i++],b=factor();
+   if(op==="/"&&b===0)throw Error("Divide by zero");
+   v=op==="*"?v*b:v/b;
+  }
+  return v;
+ }
+ function factor(){
+  if(t[i]==="+"){i++;return factor();}
+  if(t[i]==="-"){i++;return-factor();}
+  if(t[i]==="("){
+   i++;let v=expr();
+   if(t[i++]!==")")throw Error("Bracket error");
+   return v;
+  }
+  let token=t[i++];
+  if(token===undefined||!/^\d+(?:\.\d+)?$/.test(token))throw Error("Number error");
+  let n=Number(token);
+  if(t[i]==="%"){i++;n/=100;}
+  return n;
+ }
+ let n=expr();
+ if(i!==t.length||!Number.isFinite(n))throw Error("Invalid result");
+ return n;
+}
+
+function calcResult(){
+ try{
+  let n=evaluateMath(calcExpr);
+  calcExpr=String(Math.round(n*1e8)/1e8);
+  $("display").textContent=calcExpr;
+ }catch(e){
+  $("display").textContent="Error";
+  calcExpr="Error";
+ }
+}
+
+function reportRows(){
+ let r=[["Date","Voucher No","Type","Narration","Ledger","Debit","Credit"]];
+ (year()?.vouchers||[]).forEach(v=>v.lines.forEach(e=>r.push([
+  v.date,v.number,v.type,v.narration,
+  client().ledgers.find(l=>l.id===e.ledgerId)?.name||"Unknown",e.dr,e.cr
+ ])));
+ return r;
+}
+
+function exportExcel(){
+ if(!client()||!year()){alert("Select client and year");return;}
+ if(!window.XLSX){alert("Excel library load nahi hui. Internet check karein.");return;}
+ let wb=XLSX.utils.book_new();
+ XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(reportRows()),"Transactions");
+ XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([
+  ["Ledger","Group","Opening","Current Balance"],
+  ...client().ledgers.map(l=>[l.name,l.group,l.opening?.[yearId]?.amount||0,net(l)])
+ ]),"Ledgers");
+ XLSX.writeFile(wb,`SAFS-${client().name}-${year().name}.xlsx`);
+}
+
+function exportPDF(){
+ if(!client()||!year()){alert("Select client and year");return;}
+ if(!window.jspdf){alert("PDF library load nahi hui");return;}
+ let doc=new window.jspdf.jsPDF();
+ doc.text(`SAFS ASSOCIATE | ${client().name} | ${year().name}`,14,15);
+ doc.autoTable({startY:22,head:[reportRows()[0]],body:reportRows().slice(1)});
+ doc.save("SAFS-Accounting.pdf");
+}
+
+function exportWord(){
+ if(!client()||!year()){alert("Select client and year");return;}
+ let rows=reportRows();
+ let content="<html><meta charset='utf-8'><body><h1>SAFS ASSOCIATE</h1><h3>"+
+ esc(client().name)+" | "+esc(year().name)+"</h3><table border='1' cellpadding='5'>"+
+ rows.map((r,i)=>"<tr>"+r.map(c=>`<${i?"td":"th"}>${esc(c)}</${i?"td":"th"}>`).join("")+"</tr>").join("")+
+ "</table></body></html>";
+ download(new Blob(["\ufeff",content],{type:"application/msword"}),"SAFS-Accounting.doc");
+}
+
+function download(blob,name){
+ let u=URL.createObjectURL(blob),a=document.createElement("a");
+ a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();
+ setTimeout(()=>URL.revokeObjectURL(u),1000);
+}
+function backup(){
+ download(new Blob([JSON.stringify(db,null,2)],{type:"application/json"}),"SAFS-ASSOCIATE-Backup.json");
+}
+function restoreBackup(ev){
+ let f=ev.target.files[0];if(!f)return;
+ let r=new FileReader();
+ r.onload=()=>{
+  try{
+   let x=JSON.parse(r.result);
+   if(!Array.isArray(x.clients))throw Error();
+   if(!confirm("All current client data will be replaced. Continue?"))return;
+   db=x;clientId="";yearId="";persist();renderAll();alert("Backup restored");
+  }catch(e){alert("Invalid SAFS backup file");}
+  finally{ev.target.value="";}
+ };
  r.readAsText(f);
 }
-function exportRows(){
- let c=client(),b=book(),rows=[];
- b.vouchers.forEach(v=>v.lines.forEach(x=>{
- let l=c.ledgers.find(z=>z.id===x.ledgerId);
- rows.push({Date:v.date,VoucherType:v.type,Narration:v.narration,Ledger:l?.name||"",Group:l?.group||"",Debit:x.dr,Credit:x.cr});
- }));
- return rows;
-}
-function exportExcel(){
- if(!window.XLSX){alert("Excel export ke liye internet connection chahiye.");return}
- let rows=exportRows();let ws=XLSX.utils.json_to_sheet(rows),wb=XLSX.utils.book_new();
- XLSX.utils.book_append_sheet(wb,ws,"FY "+book().name);
- XLSX.writeFile(wb,client().name+"-"+book().name+".xlsx");
-}
-function exportPDF(){
- if(!window.jspdf){alert("PDF export ke liye internet connection chahiye.");return}
- let doc=new jspdf.jsPDF(),c=client(),b=book(),rows=exportRows();
- doc.setFontSize(16);doc.text("SAFS ASSOCIATE",14,15);
- doc.setFontSize(11);doc.text(c.name+" | FY "+b.name,14,23);
- let y=33;doc.text("Date       Type       Ledger                  Debit           Credit",14,y);y+=8;
- rows.forEach(r=>{if(y>280){doc.addPage();y=18}
- let line=`${r.Date}  ${r.VoucherType}  ${r.Ledger}`.slice(0,65);
- doc.text(line,14,y);doc.text(String(r.Debit),145,y);doc.text(String(r.Credit),180,y);y+=7;
- });
- doc.save(c.name+"-"+b.name+".pdf");
-}
-function exportWord(){
- let c=client(),b=book(),rows=exportRows();
- let html=`<html><head><meta charset="utf-8"></head><body><h2>SAFS ASSOCIATE</h2><h3>${esc(c.name)} - FY ${esc(b.name)}</h3><table border="1"><tr><th>Date</th><th>Type</th><th>Ledger</th><th>Debit</th><th>Credit</th></tr>${rows.map(r=>`<tr><td>${esc(r.Date)}</td><td>${esc(r.VoucherType)}</td><td>${esc(r.Ledger)}</td><td>${r.Debit}</td><td>${r.Credit}</td></tr>`).join("")}</table></body></html>`;
- let blob=new Blob(["\ufeff",html],{type:"application/msword"}),a=document.createElement("a");
- a.href=URL.createObjectURL(blob);a.download=c.name+"-"+b.name+".doc";a.click();URL.revokeObjectURL(a.href);
-}
-function calcAdd(x){$("calcDisplay").value+="";
- $("calcDisplay").value+={ "*":"*", "/":"/" }[x]||x}
-function calcClear(){$("calcDisplay").value=""}
-function calcBack(){$("calcDisplay").value=$("calcDisplay").value.slice(0,-1)}
-function calcResult(){
- let s=$("calcDisplay").value;
- if(!s||!/^[0-9+\-*/%.() ]+$/.test(s)){alert("Invalid calculation");return}
- try{
- s=s.replace(/(\d+(?:\.\d+)?)%/g,"($1/100)");
- let result=Function('"use strict";return ('+s+')')();
- if(!Number.isFinite(result))throw 0;
- $("calcDisplay").value=String(Math.round(result*100000000)/100000000);
- }catch(e){alert("Calculation error")}
-}
-renderClientList();
-if(db.clients.length)selectClient(db.clients[0].id);
+
+$("vDate").value=today();
+ensureSelection();
+renderAll();
+clearVoucher();
+persist();
 </script>
 </body>
 </html>
