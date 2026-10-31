@@ -339,20 +339,17 @@ footer{text-align:center;background:#101d35;color:#dce6f7;padding:14px;font-size
   </div>
  </div>
 </section>
- <section id="📁 File Upload" class="page">
-  <button class="nav" onclick="page('uploads',this)">📁 File Upload</button>
  <section id="uploads" class="page">
  <h2>Client Documents / File Upload</h2>
  <div class="card">
   <h3>Upload Documents</h3>
+  <p class="muted">PDF, Word, Excel, JPG, JPEG, PNG files upload karein. Maximum 20 MB per file.</p>
   <label>Select Files</label>
-  <input id="documentFiles" type="file" multiple
-   accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png">
+  <input id="documentFiles" type="file" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png">
   <div class="actions">
-   <button class="success" onclick="uploadDocuments()">Upload Files</button>
+   <button class="success" onclick="uploadDocuments()">⬆ Upload Selected Files</button>
   </div>
-  <p class="muted">Maximum 20 MB per file.</p>
-  <div id="uploadStatus"></div>
+  <div id="uploadStatus" class="muted"></div>
  </div>
  <div class="card">
   <h3>Uploaded Documents</h3>
