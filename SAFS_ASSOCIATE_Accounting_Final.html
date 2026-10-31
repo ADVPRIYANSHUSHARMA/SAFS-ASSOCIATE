@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SAFS ASSOCIATE | Accounting Suite</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+
+<style>
+:root{
+ --navy:#12213a;--blue:#2459a6;--bg:#f2f5fa;
+ --white:#fff;--text:#26364d;--muted:#738198;
+ --border:#dfe6ef;--green:#13875b;--red:#d64545
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);font-family:Arial,sans-serif;color:var(--text)}
+header{
+ background:linear-gradient(110deg,#101d35,#2456a6);
+ color:white;padding:12px 20px;display:flex;align-items:center;
+ justify-content:space-between;gap:12px;flex-wrap:wrap
+}
+.brand{display:flex;align-items:center;gap:12px}
+.brand img{
+ width:58px;height:54px;object-fit:contain;
+ background:#fff;padding:5px;border-radius:8px;display:block
+}
+.brand h1{font-size:20px;margin:0;letter-spacing:1px}
+.brand p{font-size:10px;letter-spacing:2px;margin:5px 0 0;color:#dce8ff}
+.header-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.header-right select{width:auto;min-width:170px}
+.layout{display:flex;min-height:calc(100vh - 80px)}
+.sidebar{width:220px;background:var(--navy);padding:12px 9px;flex-shrink:0}
+.sidebar h4{color:#8fa9d0;font-size:10px;padding-left:10px;letter-spacing:1px}
+.nav{
+ display:block;width:100%;text-align:left;padding:11px;margin:3px 0;
+ border:0;background:transparent;color:#dce6f7;border-radius:6px;
+ cursor:pointer;font-size:13px
+}
+.nav:hover,.nav.active{background:#294b7b;color:white}
+main{flex:1;padding:20px;min-width:0}
+.page{display:none}.page.active{display:block}
+h2{font-size:21px;margin:0 0 16px;color:#172d4c}
+h3{font-size:15px;margin:0 0 13px}
+.card{
+ background:white;border:1px solid var(--border);border-radius:10px;
+ padding:16px;margin-bottom:15px;box-shadow:0 3px 12px #152b4808
+}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:12px}
+.stat{background:white;border:1px solid var(--border);border-radius:9px;padding:16px}
+.stat small{color:var(--muted);font-size:12px}
+.stat strong{display:block;font-size:21px;margin-top:8px;color:#214b83}
+label{font-size:12px;font-weight:bold;display:block;margin-bottom:6px}
+input,select,textarea{
+ width:100%;padding:10px;border:1px solid #d8e0eb;border-radius:6px;
+ font-size:13px;background:white;color:var(--text)
+}
+.field{flex:1;min-width:145px}
+.row{display:flex;gap:11px;flex-wrap:wrap;margin-bottom:12px}
+button{
+ border:0;border-radius:6px;padding:10px 13px;background:var(--blue);
+ color:white;font-weight:bold;font-size:12px;cursor:pointer
+}
+button:hover{filter:brightness(1.08)}
+.secondary{background:#e8eef7;color:#25466f}
+.success{background:var(--green)}
+.danger{background:var(--red)}
+.dark{background:#172b4d}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.table-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:650px;font-size:12px}
+th{background:#edf2f9;text-align:left;color:#314867}
+td,th{padding:10px 9px;border-bottom:1px solid var(--border)}
+.totalbar{background:#edf3fa;padding:12px;border-radius:7px;font-size:13px;font-weight:bold;margin:12px 0}
+.entry-row{
+ display:grid;grid-template-columns:minmax(180px,1fr) 135px 135px 42px;
+ gap:7px;margin-bottom:7px;align-items:center
+}
+.entry-heading{font-size:11px;color:#6c7d94;font-weight:bold;margin-bottom:8px}
+.account-entry-row{display:grid;grid-template-columns:minmax(160px,1fr) 120px minmax(160px,1fr) 120px 38px;gap:7px;margin-bottom:7px;align-items:center}
+@media(max-width:760px){.account-entry-row{grid-template-columns:1fr 1fr}.account-entry-row button{grid-column:span 2}}
+.muted{color:var(--muted);font-size:12px}
+.empty{padding:18px;text-align:center;color:var(--muted);font-size:13px}
+.calc{background:#172b4d;padding:14px;border-radius:10px;max-width:340px}
+.calc-display{
+ background:white;color:#14243d;text-align:right;padding:14px;
+ font-size:24px;border-radius:6px;margin-bottom:9px;min-height:53px;
+ overflow:auto;white-space:nowrap
+}
+.calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.calc-grid button{padding:14px 4px;background:#314e79}
+.calc-grid .op{background:#d9e7ff;color:#17365e}
+.calc-grid .equal{background:#13875b}
+.calc-grid .clear{background:#b83c48}
+footer{text-align:center;background:#101d35;color:#dce6f7;padding:14px;font-size:12px}
+@media(max-width:760px){
+ .layout{display:block}
+ .sidebar{width:100%;display:flex;overflow-x:auto;padding:7px}
+ .sidebar h4{display:none}
+ .nav{white-space:nowrap;width:auto;flex-shrink:0}
+ main{padding:11px}
+ .entry-row{grid-template-columns:1fr 1fr}
+ .entry-row button{grid-column:span 2}
+ .brand h1{font-size:16px}
+ header{padding:10px}
+ .header-right{width:100%}
+ .header-right select{flex:1}
+}
+@media print{
+ header,.sidebar,footer,.no-print{display:none!important}
+ .layout{display:block}main{padding:0}
+ .page{display:none!important}
+ .page.active{display:block!important}
+ .card{box-shadow:none}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+ <div class="brand">
+  <img src="./safs.png" alt="SAFS Logo">
+  <div>
+   <h1>SAFS ASSOCIATE</h1>
+   <p>PROFESSIONAL ACCOUNTING SUITE</p>
+  </div>
+ </div>
+ <div class="header-right">
+  <span id="activeClientLabel">No client selected</span>
+  <select id="clientSelect" onchange="selectClient(this.value)">
+   <option value="">Select Client</option>
+  </select>
+  <select id="yearSelect" onchange="selectYear(this.value)">
+   <option value="">Select Financial Year</option>
+  </select>
+ </div>
+</header>
+
+<div class="layout">
+
+<aside class="sidebar">
+ <h4>WORKSPACE</h4>
+ <button class="nav active" onclick="page('dashboard',this)">▦ Dashboard</button>
+ <button class="nav" onclick="page('clients',this)">♙ Client Master</button>
+ <button class="nav" onclick="page('ledgers',this)">☷ Ledger Master</button>
+ <button class="nav" onclick="page('voucher',this)">＋ Voucher Entry</button>
+ <button class="nav" onclick="page('plEntry',this)">↗ P&L Account Entry</button>
+ <button class="nav" onclick="page('capitalEntry',this)">◈ Capital Account Entry</button>
+ <button class="nav" onclick="page('balanceEntry',this)">▣ Balance Sheet Entry</button>
+ <button class="nav" onclick="page('daybook',this)">▤ Day Book</button>
+ <button class="nav" onclick="page('ledgerReport',this)">▥ Account Ledger</button>
+ <button class="nav" onclick="page('trial',this)">▤ Trial Balance</button>
+ <button class="nav" onclick="page('pl',this)">↗ Profit & Loss</button>
+ <button class="nav" onclick="page('balance',this)">▣ Balance Sheet</button>
+ <button class="nav" onclick="page('calculator',this)">⊞ Calculator</button>
+ <button class="nav" onclick="page('backup',this)">⇩ Export / Backup</button>
+</aside>
+
+<main>
+
+<section id="dashboard" class="page active">
+ <h2>Accounting Dashboard</h2>
+ <div id="needClient" class="card empty">
+  Client select karein ya Client Master se naya client add karein.
+ </div>
+ <div class="cards">
+  <div class="stat"><small>Current Client</small><strong id="statClient">—</strong></div>
+  <div class="stat"><small>Financial Year</small><strong id="statYear">—</strong></div>
+  <div class="stat"><small>Total Vouchers</small><strong id="statV">0</strong></div>
+  <div class="stat"><small>Total Ledgers</small><strong id="statL">0</strong></div>
+  <div class="stat"><small>Total Debit</small><strong id="statD">₹0.00</strong></div>
+  <div class="stat"><small>Total Credit</small><strong id="statC">₹0.00</strong></div>
+ </div>
+ <div class="card" style="margin-top:15px">
+  <h3>Recent Vouchers</h3>
+  <div id="recent"></div>
+ </div>
+</section>
+
+<section id="clients" class="page">
+ <h2>Client Master</h2>
+ <div class="card">
+  <h3>Add / Edit Client</h3>
+  <input type="hidden" id="editClientId">
+  <div class="row">
+   <div class="field"><label>Client / Business Name *</label><input id="clientName" placeholder="Business name"></div>
+   <div class="field"><label>Proprietor Name</label><input id="clientProprietor" placeholder="Proprietor name"></div>
+   <div class="field"><label>Mobile</label><input id="clientMobile"></div>
+   <div class="field"><label>PAN</label><input id="clientPan"></div>
+   <div class="field"><label>GSTIN</label><input id="clientGstin"></div>
+  </div>
+  <div class="row">
+   <div class="field"><label>Address</label><input id="clientAddress"></div>
+  </div>
+  <div class="actions">
+   <button class="success" onclick="saveClient()">Save Client</button>
+   <button class="secondary" onclick="resetClientForm()">Clear</button>
+  </div>
+ </div>
+ <div class="card">
+  <div class="row">
+   <div class="field">
+    <label>Search Client</label>
+    <input id="clientSearch" oninput="renderClients()" placeholder="Name, PAN, GSTIN or Client ID">
+   </div>
+  </div>
+  <div id="clientTable"></div>
+ </div>
+</section>
+
+<section id="ledgers" class="page">
+ <h2>Ledger Master</h2>
+ <div class="card">
+  <h3>Create Ledger</h3>
+  <div class="row">
+   <div class="field"><label>Ledger Name *</label><input id="ledgerName" placeholder="Cash, Bank, Sales, Rent..."></div>
+   <div class="field"><label>Under Group</label>
+    <select id="ledgerGroup">
+     <option>Asset</option><option>Liability</option><option>Capital</option>
+     <option>Direct Income</option><option>Income</option>
+     <option>Direct Expense</option><option>Expense</option>
+    </select>
+   </div>
+   <div class="field"><label>Opening Balance</label><input type="number" id="opening" min="0" step="0.01" value="0"></div>
+   <div class="field"><label>Opening Side</label><select id="openingSide"><option>Dr</option><option>Cr</option></select></div>
+  </div>
+  <button class="success" onclick="createLedger()">＋ Create Ledger</button>
+ </div>
+ <div class="card"><h3>All Ledgers</h3><div id="ledgerList"></div></div>
+</section>
+
+<section id="voucher" class="page">
+ <h2>Voucher Entry</h2>
+ <div class="card">
+  <input type="hidden" id="editVoucherId">
+  <div id="editVoucherNotice" class="totalbar" style="display:none">Editing saved entry. Save changes to update it.</div>
+  <div class="row">
+   <div class="field"><label>Voucher Type</label>
+    <select id="vType">
+     <option>Journal</option><option>Payment</option><option>Receipt</option>
+     <option>Contra</option><option>Purchase</option><option>Sales</option>
+     <option>Debit Note</option><option>Credit Note</option>
+     <option>P&amp;L Account</option><option>Capital Account</option><option>Balance Sheet</option>
+    </select>
+   </div>
+   <div class="field"><label>Date</label><input type="date" id="vDate"></div>
+   <div class="field"><label>Voucher Number</label><input id="vNo" readonly></div>
+  </div>
+  <div class="field" style="margin-bottom:14px">
+   <label>Narration</label><input id="narration" placeholder="Transaction description">
+  </div>
+  <h3>Accounting Entries</h3>
+  <div class="entry-row entry-heading">
+   <div>Ledger</div><div>Debit (Dr)</div><div>Credit (Cr)</div><div></div>
+  </div>
+  <div id="entries"></div>
+  <div class="actions">
+   <button class="secondary" onclick="addEntry()">＋ Add Ledger Row</button>
+  </div>
+  <div class="totalbar" id="totals">Debit ₹0.00 | Credit ₹0.00 | Difference ₹0.00</div>
+  <div class="actions">
+   <button class="success" id="saveVoucherButton" onclick="saveVoucher()">Save Voucher</button>
+   <button class="secondary" onclick="clearVoucher()">Clear / Cancel Edit</button>
+  </div>
+ </div>
+</section>
+
+<section id="plEntry" class="page">
+ <h2>Profit & Loss Account Entry</h2><p class="muted">P&L-specific heads only. Expenses are Debit; Income is Credit.</p>
+ <div class="card"><div class="row"><div class="field"><label>Date</label><input type="date" id="plDate"></div><div class="field"><label>Narration</label><input id="plNarration"></div></div>
+ <div class="account-entry-row entry-heading"><div>Debit – Expenditure Head</div><div>Amount</div><div>Credit – Income Head</div><div>Amount</div><div></div></div><div id="plRows"></div>
+ <div class="actions"><button class="secondary" onclick="addAccountRow('pl')">＋ Add Row</button><button class="success" onclick="saveAccountBook('pl')">Save P&L Entry</button><button class="secondary" onclick="resetAccountBook('pl')">Clear</button></div><div class="totalbar" id="plTotals"></div></div><div class="card"><h3>Saved P&L Heads</h3><div id="plEntrySummary"></div></div>
+</section>
+<section id="capitalEntry" class="page">
+ <h2>Capital Account Entry</h2><p class="muted">Capital-specific heads only.</p>
+ <div class="card"><div class="row"><div class="field"><label>Date</label><input type="date" id="capitalDate"></div><div class="field"><label>Narration</label><input id="capitalNarration"></div></div>
+ <div class="account-entry-row entry-heading"><div>Debit Head</div><div>Amount</div><div>Credit Head</div><div>Amount</div><div></div></div><div id="capitalRows"></div>
+ <div class="actions"><button class="secondary" onclick="addAccountRow('capital')">＋ Add Row</button><button class="success" onclick="saveAccountBook('capital')">Save Capital Entry</button><button class="secondary" onclick="resetAccountBook('capital')">Clear</button></div><div class="totalbar" id="capitalTotals"></div></div><div class="card"><h3>Saved Capital Heads</h3><div id="capitalEntrySummary"></div></div>
+</section>
+<section id="balanceEntry" class="page">
+ <h2>Balance Sheet Entry</h2><p class="muted">Liabilities are Credit side; Assets are Debit side.</p>
+ <div class="card"><div class="row"><div class="field"><label>Date</label><input type="date" id="balanceDate"></div><div class="field"><label>Narration</label><input id="balanceNarration"></div></div>
+ <div class="account-entry-row entry-heading"><div>Liabilities – Credit</div><div>Amount</div><div>Assets – Debit</div><div>Amount</div><div></div></div><div id="balanceRows"></div>
+ <div class="actions"><button class="secondary" onclick="addAccountRow('balance')">＋ Add Row</button><button class="success" onclick="saveAccountBook('balance')">Save Balance Sheet Entry</button><button class="secondary" onclick="resetAccountBook('balance')">Clear</button></div><div class="totalbar" id="balanceTotals"></div></div><div class="card"><h3>Saved Balance Sheet Heads</h3><div id="balanceEntrySummary"></div></div>
+</section>
+<section id="daybook" class="page">
+ <h2>Day Book</h2><p class="muted">Yahan se Voucher, P&amp;L, Capital aur Balance Sheet ki saved entries Edit ya Delete kar sakte hain.</p><div class="card"><div id="daybookTable"></div></div>
+</section>
+
+<section id="ledgerReport" class="page">
+ <h2>Account Ledger</h2>
+ <div class="card">
+  <div class="field"><label>Select Ledger</label><select id="reportLedger" onchange="renderLedgerReport()"></select></div>
+  <div id="ledgerReportTable" style="margin-top:14px"></div>
+ </div>
+</section>
+
+<section id="trial" class="page">
+ <h2>Trial Balance</h2><div class="card"><div id="trialTable"></div></div>
+</section>
+
+<section id="pl" class="page">
+ <h2>Profit & Loss</h2>
+ <div class="card">
+  <p class="muted">Income and expenses based on posted vouchers and opening balances. Review account groups before relying on statutory reports.</p>
+  <div class="actions no-print"><button class="success" onclick="exportPLPDF()">Download Professional P&amp;L PDF</button></div>
+  <div id="plTable"></div>
+ </div>
+</section>
+
+<section id="balance" class="page">
+ <h2>Balance Sheet</h2>
+ <div class="card">
+  <p class="muted">Management summary; verify classifications and year-end adjustments with your accountant.</p>
+  <div id="balanceTable"></div>
+ </div>
+</section>
+
+<section id="calculator" class="page">
+ <h2>Accounting Calculator</h2>
+ <p class="muted">Quick calculations while entering vouchers, ledgers and account balances.</p>
+ <div class="card">
+  <div class="calc">
+   <div class="calc-display" id="display" aria-live="polite">0</div>
+   <div class="calc-grid">
+    <button class="clear" onclick="clearCalc()">AC</button>
+    <button onclick="calcInput('%')">%</button>
+    <button onclick="backCalc()">⌫</button>
+    <button class="op" onclick="calcInput('/')">÷</button>
+    <button onclick="calcInput('7')">7</button><button onclick="calcInput('8')">8</button><button onclick="calcInput('9')">9</button><button class="op" onclick="calcInput('*')">×</button>
+    <button onclick="calcInput('4')">4</button><button onclick="calcInput('5')">5</button><button onclick="calcInput('6')">6</button><button class="op" onclick="calcInput('-')">−</button>
+    <button onclick="calcInput('1')">1</button><button onclick="calcInput('2')">2</button><button onclick="calcInput('3')">3</button><button class="op" onclick="calcInput('+')">+</button>
+    <button onclick="calcInput('0')">0</button><button onclick="calcInput('.')">.</button><button onclick="calcInput('(')">(</button><button onclick="calcInput(')')">)</button>
+    <button class="equal" style="grid-column:span 4" onclick="calcResult()">=</button>
+   </div>
+  </div>
+ </div>
+</section>
+
+<section id="backup" class="page">
+ <h2>Export & Backup</h2>
+ <div class="card">
+  <h3>Export Current Financial Year</h3>
+  <div class="actions">
+   <button onclick="exportPDF()">PDF Export</button>
+   <button class="success" onclick="exportExcel()">Excel Export</button>
+   <button class="dark" onclick="exportWord()">Word Export</button>
+   <button class="secondary" onclick="window.print()">Print</button>
+  </div>
+ </div>
+ <div class="card">
+  <h3>Full Data Backup / Restore</h3>
+  <div class="actions">
+   <button onclick="backup()">Download JSON Backup</button>
+   <button class="secondary" onclick="document.getElementById('restore').click()">Restore Backup</button>
+   <input id="restore" type="file" accept=".json" hidden onchange="restoreBackup(event)">
+  </div>
+  <p class="muted">Backup mein sabhi clients, financial years, ledgers aur vouchers save honge. Data isi browser mein rehta hai; regular backup rakhein.</p>
+ </div>
+</section>
+
+</main>
+</div>
+
+<footer>© Copyright 2026 SAFS ASSOCIATE. All Rights Reserved.</footer>
+
+<script>
+"use strict";
+
+const KEY="SAFS_ASSOCIATE_ACCOUNTING_V4";
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+const today=()=>{
+ const d=new Date();
+ return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10);
+};
+const money=n=>"₹"+Number(n||0).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2});
+const FYDEFAULT=["2024-25","2025-26","2026-27"];
+
+const DEFAULTS=[
+ ["Cash in Hand","Asset"],["Bank Account","Asset"],["Sundry Debtors","Asset"],
+ ["Furniture","Asset"],["Computer & Equipment","Asset"],["Input CGST","Asset"],
+ ["Input SGST","Asset"],["Input IGST","Asset"],["Sundry Creditors","Liability"],
+ ["Output CGST","Liability"],["Output SGST","Liability"],["Output IGST","Liability"],
+ ["Capital Account","Capital"],["Drawings","Capital"],["Sales Account","Direct Income"],
+ ["Service Income","Direct Income"],["Interest Received","Income"],
+ ["Purchase Account","Direct Expense"],["Tax Payment","Expense"],
+ ["Printing & Stationery","Expense"],["Salary","Expense"],["Rent","Expense"],
+ ["Electricity","Expense"],["Internet Expenses","Expense"],
+ ["Travelling Expenses","Expense"],["Bank Charges","Expense"],["Depreciation","Expense"]
+];
+
+function freshYear(name){return{id:uid(),name,vouchers:[]};}
+function freshClient(x){
+ return {
+  id:uid(),code:"CL-"+Math.random().toString(36).slice(2,7).toUpperCase(),
+  name:x.name,mobile:x.mobile,pan:x.pan,gstin:x.gstin,address:x.address,
+  ledgers:DEFAULTS.map(a=>({id:uid(),name:a[0],group:a[1],opening:{}})),
+  years:FYDEFAULT.map(freshYear)
+ };
+}
+
+function loadDB(){
+ try{
+  let d=JSON.parse(localStorage.getItem(KEY));
+  if(d&&Array.isArray(d.clients))return d;
+ }catch(e){}
+ return{clients:[]};
+}
+
+let db=loadDB();
+let clientId=localStorage.getItem(KEY+"_client")||"";
+let yearId=localStorage.getItem(KEY+"_year")||"";
+
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({
+ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+}[c]));
+
+function persist(){
+ localStorage.setItem(KEY,JSON.stringify(db));
+ localStorage.setItem(KEY+"_client",clientId);
+ localStorage.setItem(KEY+"_year",yearId);
+}
+function client(){return db.clients.find(x=>x.id===clientId)||null;}
+function year(){return client()?.years.find(x=>x.id===yearId)||null;}
+
+function ensureSelection(){
+ if(!client())clientId=db.clients[0]?.id||"";
+ if(client()&&!year())yearId=client().years[0]?.id||"";
+ if(!client())yearId="";
+}
+
+function selectClient(id){
+ clientId=id;
+ yearId=client()?.years[0]?.id||"";
+ persist();renderAll();
+}
+function selectYear(id){yearId=id;persist();renderAll();}
+
+function page(id,btn){
+ document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));
+ $(id).classList.add("active");
+ document.querySelectorAll(".nav").forEach(x=>x.classList.remove("active"));
+ if(btn)btn.classList.add("active");
+ renderAll();
+}
+
+function renderSelectors(){
+ ensureSelection();
+ $("clientSelect").innerHTML='<option value="">Select Client</option>'+
+ db.clients.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join("");
+ $("clientSelect").value=clientId;
+ $("yearSelect").innerHTML=client()
+  ?client().years.map(y=>`<option value="${y.id}">${esc(y.name)}</option>`).join("")
+  :'<option value="">Select Financial Year</option>';
+ $("yearSelect").value=yearId;
+ $("activeClientLabel").textContent=client()
+  ?client().name+" | "+(year()?.name||""):"No client selected";
+}
+
+function saveClient(){
+ let name=$("clientName").value.trim();
+ if(!name){alert("Client name required");return;}
+ let id=$("editClientId").value;
+ let data={
+  name,proprietor:$("clientProprietor").value.trim(),mobile:$("clientMobile").value.trim(),
+  pan:$("clientPan").value.trim().toUpperCase(),
+  gstin:$("clientGstin").value.trim().toUpperCase(),
+  address:$("clientAddress").value.trim()
+ };
+ if(id){
+  Object.assign(db.clients.find(c=>c.id===id),data);
+ }else{
+  let c=freshClient(data);
+  db.clients.push(c);clientId=c.id;yearId=c.years[0].id;
+ }
+ resetClientForm();persist();renderAll();alert("Client saved successfully");
+}
+
+function resetClientForm(){
+ $("editClientId").value="";
+ ["clientName","clientProprietor","clientMobile","clientPan","clientGstin","clientAddress"].forEach(id=>$(id).value="");
+}
+
+function editClient(id){
+ let c=db.clients.find(x=>x.id===id);if(!c)return;
+ $("editClientId").value=id;
+ $("clientName").value=c.name;
+ $("clientProprietor").value=c.proprietor||"";
+ $("clientMobile").value=c.mobile||"";
+ $("clientPan").value=c.pan||"";
+ $("clientGstin").value=c.gstin||"";
+ $("clientAddress").value=c.address||"";
+ page("clients",document.querySelectorAll(".nav")[1]);
+}
+
+function deleteClient(id){
+ let c=db.clients.find(x=>x.id===id);
+ if(!c||!confirm("Delete client and all its books/vouchers? Take backup first if needed."))return;
+ db.clients=db.clients.filter(x=>x.id!==id);
+ if(clientId===id){clientId="";yearId="";}
+ persist();renderAll();
+}
+
+function addYear(){
+ if(!client()){alert("Pehle client select karein");return;}
+ let name=prompt("Financial Year name (example: 2027-28)");
+ if(!name)return;
+ name=name.trim();
+ if(client().years.some(y=>y.name===name)){alert("Financial year already exists");return;}
+ let y=freshYear(name);
+ client().years.push(y);yearId=y.id;
+ persist();renderAll();
+}
+
+function options(){
+ return '<option value="">Select Ledger</option>'+
+ (client()?.ledgers||[]).map(l=>`<option value="${l.id}">${esc(l.name)}</option>`).join("");
+}
+
+/* Account-specific dropdown heads; saved through the existing voucher system. */
+const ACCOUNT_HEADS={
+ pl:{debit:[["GST Purchased","Direct Expense"],["Tax Payment","Expense"],["Printing & Stationery","Expense"],["Telephone Expenses","Expense"],["Rent","Expense"],["Electricity Expenses","Expense"],["Salary","Expense"],["Bank Charges","Expense"],["Office Expenses","Expense"],["Travelling Expenses","Expense"],["Repair & Maintenance","Expense"],["Advertisement Expenses","Expense"],["Depreciation","Expense"],["Audit Fees","Expense"],["Professional Fees","Expense"],["Interest Paid","Expense"],["Insurance","Expense"],["Postage & Courier","Expense"],["Internet Expenses","Expense"],["Miscellaneous Expenses","Expense"]],credit:[["Sales","Direct Income"],["Commission Received","Income"],["Interest Received","Income"],["Service Charges Received","Income"],["Discount Received","Income"],["Other Income","Income"]]},
+ capital:{debit:[["Drawings","Capital"],["Personal Expenses","Capital"],["Capital Withdrawn","Capital"],["Opening Capital Adjustment","Capital"]],credit:[["Opening Capital","Capital"],["Additional Capital","Capital"],["Capital Introduced","Capital"],["Net Profit","Capital"],["Interest on Capital","Capital"]]},
+ balance:{debit:[["Furniture","Asset"],["Computer & Equipment","Asset"],["Machinery","Asset"],["Building","Asset"],["Cash in Hand","Asset"],["Bank Account","Asset"],["Sundry Debtors","Asset"],["Closing Stock","Asset"],["Advance Payments","Asset"],["Security Deposit","Asset"],["Fixed Assets","Asset"],["Input CGST","Asset"],["Input SGST","Asset"],["Input IGST","Asset"]],credit:[["Loan","Liability"],["Bank Loan","Liability"],["Sundry Creditors","Liability"],["Outstanding Expenses","Liability"],["GST Payable","Liability"],["TDS Payable","Liability"],["Duties & Taxes Payable","Liability"],["Current Liabilities","Liability"],["Capital Account","Capital"]]}
+};
+function accountLedger(head,group){let l=client().ledgers.find(x=>x.name.toLowerCase()===head.toLowerCase());if(!l){l={id:uid(),name:head,group,opening:{}};client().ledgers.push(l);}else l.group=group;return l;}
+function addAccountRow(kind){
+ const cfg=ACCOUNT_HEADS[kind],row=document.createElement("div");row.className="account-entry-row";
+ const opts=a=>'<option value="">Select Account Head</option>'+a.map(x=>`<option value="${esc(x[0])}">${esc(x[0])}</option>`).join("");
+ const left=kind==="balance"?cfg.credit:cfg.debit,right=kind==="balance"?cfg.debit:cfg.credit;
+ row.innerHTML=`<select class="acc-left">${opts(left)}</select><input class="acc-la" type="number" min="0" step="0.01" placeholder="Amount"><select class="acc-right">${opts(right)}</select><input class="acc-ra" type="number" min="0" step="0.01" placeholder="Amount"><button class="danger" type="button">×</button>`;
+ row.querySelectorAll("input").forEach(x=>x.addEventListener("input",()=>calcAccountRows(kind)));row.querySelector("button").onclick=()=>{row.remove();calcAccountRows(kind);};$(kind+"Rows").appendChild(row);calcAccountRows(kind);
+}
+function readAccountRows(k){return [...$(k+"Rows").querySelectorAll(".account-entry-row")].map(r=>({a:r.querySelector(".acc-left").value,aa:Number(r.querySelector(".acc-la").value)||0,b:r.querySelector(".acc-right").value,ba:Number(r.querySelector(".acc-ra").value)||0}));}
+function calcAccountRows(k){let x=readAccountRows(k),a=x.reduce((n,r)=>n+r.aa,0),b=x.reduce((n,r)=>n+r.ba,0);$(k+"Totals").textContent=`Side 1: ${money(a)} | Side 2: ${money(b)} | Difference: ${money(Math.abs(a-b))}`;}
+function resetAccountBook(k){$(k+"Rows").innerHTML="";$(k+"Narration").value="";$(k+"Date").value=today();addAccountRow(k);addAccountRow(k);}
+function saveAccountBook(k){
+ if(!client()||!year()){alert("Select client and financial year first.");return;}
+ const cfg=ACCOUNT_HEADS[k],lines=[];
+ readAccountRows(k).forEach(r=>{
+  if(r.a&&r.aa>0){let g=(k==="balance"?cfg.credit:cfg.debit).find(x=>x[0]===r.a)[1],l=accountLedger(r.a,g);lines.push({ledgerId:l.id,dr:k==="balance"?0:r.aa,cr:k==="balance"?r.aa:0});}
+  if(r.b&&r.ba>0){let g=(k==="balance"?cfg.debit:cfg.credit).find(x=>x[0]===r.b)[1],l=accountLedger(r.b,g);lines.push({ledgerId:l.id,dr:k==="balance"?r.ba:0,cr:k==="balance"?0:r.ba});}
+ });
+ let dr=lines.reduce((n,x)=>n+x.dr,0),cr=lines.reduce((n,x)=>n+x.cr,0);
+ if(!lines.length){alert("Select account head and enter amount.");return;}
+ /* P&L statement is balanced with its net profit/loss transfer. */
+ if(k==="pl" && Math.abs(dr-cr)>.005){
+  const difference=Math.abs(dr-cr);
+  const balancingHead=dr>cr?"Net Loss Transfer":"Net Profit Transfer";
+  const bal=accountLedger(balancingHead,"Capital");
+  lines.push({ledgerId:bal.id,dr:dr>cr?0:difference,cr:dr>cr?difference:0});
+  dr=lines.reduce((n,x)=>n+x.dr,0);cr=lines.reduce((n,x)=>n+x.cr,0);
+ }
+ if(Math.abs(dr-cr)>.005){alert("Debit and Credit totals must match. Difference: "+money(Math.abs(dr-cr)));return;}
+ year().vouchers.push({id:uid(),number:nextVoucherNo(),date:$(k+"Date").value||today(),type:k==="pl"?"P&L Account":k==="capital"?"Capital Account":"Balance Sheet",narration:$(k+"Narration").value.trim(),lines});
+ persist();renderAll();resetAccountBook(k);alert("Entry saved.");
+}
+function renderAccountEntrySummaries(){
+ if(!client()){["pl","capital","balance"].forEach(k=>$(k+"EntrySummary").innerHTML='<div class="empty">Select client first.</div>');return;}
+ const gs={pl:["Income","Direct Income","Expense","Direct Expense"],capital:["Capital"],balance:["Asset","Liability"]};
+ ["pl","capital","balance"].forEach(k=>{let ls=client().ledgers.filter(l=>gs[k].includes(l.group));$(k+"EntrySummary").innerHTML=table(["Account Head","Group","Balance"],ls.map(l=>[esc(l.name),esc(l.group),money(Math.abs(net(l)))+(net(l)>=0?" Dr":" Cr")]));});
+}
+function createLedger(){
+ if(!client()){alert("Select client first");return;}
+ let name=$("ledgerName").value.trim();
+ let opening=Number($("opening").value)||0;
+ if(!name||opening<0){alert("Valid ledger name/opening balance enter karein");return;}
+ if(client().ledgers.some(l=>l.name.toLowerCase()===name.toLowerCase())){
+  alert("Ledger already exists");return;
+ }
+ let l={id:uid(),name,group:$("ledgerGroup").value,opening:{}};
+ l.opening[yearId]={amount:opening,side:$("openingSide").value};
+ client().ledgers.push(l);
+ $("ledgerName").value="";$("opening").value=0;
+ persist();renderAll();
+}
+
+function addEntry(data={}){
+ let d=document.createElement("div");
+ d.className="entry-row";
+ d.innerHTML=`
+ <select class="entry-ledger">${options()}</select>
+ <input class="entry-dr" type="number" min="0" step="0.01" placeholder="Debit">
+ <input class="entry-cr" type="number" min="0" step="0.01" placeholder="Credit">
+ <button class="danger" type="button">×</button>`;
+ d.querySelector(".entry-ledger").value=data.ledgerId||"";
+ d.querySelector(".entry-dr").value=data.dr||"";
+ d.querySelector(".entry-cr").value=data.cr||"";
+ d.querySelectorAll("input").forEach(x=>x.addEventListener("input",calculate));
+ d.querySelector("button").onclick=()=>{d.remove();calculate();};
+ $("entries").appendChild(d);calculate();
+}
+
+function linesRead(){
+ return [...document.querySelectorAll("#entries .entry-row")].map(r=>({
+  ledgerId:r.querySelector(".entry-ledger").value,
+  dr:Number(r.querySelector(".entry-dr").value)||0,
+  cr:Number(r.querySelector(".entry-cr").value)||0
+ }));
+}
+
+function calculate(){
+ let lines=linesRead(),dr=0,cr=0,valid=true;
+ lines.forEach(x=>{
+  if(x.dr<0||x.cr<0||(x.dr>0&&x.cr>0))valid=false;
+  dr+=x.dr;cr+=x.cr;
+ });
+ let diff=dr-cr;
+ $("totals").textContent=
+ `Debit: ${money(dr)} | Credit: ${money(cr)} | Difference: ${money(Math.abs(diff))}`+
+ (valid?"":" | Check entries");
+ return{dr,cr,valid,diff,lines};
+}
+
+function clearVoucher(){
+ $("editVoucherId").value="";
+ $("editVoucherNotice").style.display="none";
+ $("saveVoucherButton").textContent="Save Voucher";
+ $("entries").innerHTML="";
+ $("narration").value="";
+ $("vType").value="Journal";
+ $("vDate").value=today();
+ $("vNo").value=nextVoucherNo();
+ addEntry();addEntry();
+}
+
+function nextVoucherNo(){
+ return "V-"+String((year()?.vouchers.length||0)+1).padStart(4,"0");
+}
+
+function editVoucher(id){
+ if(!year())return;
+ const v=year().vouchers.find(x=>x.id===id);
+ if(!v)return;
+ $("editVoucherId").value=v.id;
+ $("editVoucherNotice").style.display="block";
+ $("saveVoucherButton").textContent="Update Entry";
+ $("vType").value=[...$("vType").options].some(o=>o.value===v.type)?v.type:"Journal";
+ $("vDate").value=v.date||today();
+ $("vNo").value=v.number||"";
+ $("narration").value=v.narration||"";
+ $("entries").innerHTML="";
+ (v.lines||[]).forEach(line=>addEntry(line));
+ if(!(v.lines||[]).length){addEntry();addEntry();}
+ page("voucher",document.querySelector('.nav[onclick^="page(\'voucher\'"]'));
+}
+
+function deleteVoucher(id){
+ if(!year())return;
+ const v=year().vouchers.find(x=>x.id===id);
+ if(!v||!confirm(`Delete ${v.number||"this entry"}? This will change ledger balances and reports.`))return;
+ year().vouchers=year().vouchers.filter(x=>x.id!==id);
+ persist();renderAll();
+ if($("editVoucherId").value===id)clearVoucher();
+}
+
+function saveVoucher(){
+ if(!client()||!year()){alert("Client aur financial year select karein");return;}
+ let t=calculate();
+ if(!t.valid||
+    t.lines.some(x=>!x.ledgerId&&(x.dr||x.cr))||
+    t.lines.filter(x=>x.ledgerId&&(x.dr||x.cr)).length<2||
+    t.dr<=0||Math.abs(t.diff)>.005||
+    t.lines.some(x=>x.ledgerId&&!x.dr&&!x.cr)){
+  alert("Har amount ke liye ledger select karein. Dr aur Cr equal hone chahiye; minimum 2 entries.");
+  return;
+ }
+ const editId=$("editVoucherId").value;
+ const record={
+  id:editId||uid(),
+  number:$('vNo').value||nextVoucherNo(),
+  date:$('vDate').value||today(),
+  type:$('vType').value,
+  narration:$('narration').value.trim(),
+  lines:t.lines.filter(x=>x.ledgerId&&(x.dr||x.cr))
+ };
+ if(editId){
+  const index=year().vouchers.findIndex(v=>v.id===editId);
+  if(index<0){alert("Original entry was not found. Please refresh and try again.");return;}
+  year().vouchers[index]=record;
+ }else{
+  year().vouchers.push(record);
+ }
+ persist();renderAll();clearVoucher();
+ alert(editId?"Entry updated successfully":"Voucher saved successfully");
+}
+
+function net(l){
+ let ob=l.opening?.[yearId]||{amount:0,side:"Dr"};
+ let n=(ob.side==="Dr"?1:-1)*Number(ob.amount||0);
+ (year()?.vouchers||[]).forEach(v=>v.lines.forEach(e=>{
+  if(e.ledgerId===l.id)n+=e.dr-e.cr;
+ }));
+ return n;
+}
+
+function table(head,rows){
+ if(!rows.length)return'<div class="empty">No records available.</div>';
+ return `<div class="table-wrap"><table><thead><tr>${head.map(x=>`<th>${x}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>"<tr>"+r.map(x=>`<td>${x??""}</td>`).join("")+"</tr>").join("")}</tbody></table></div>`;
+}
+
+function renderClients(){
+ let q=$("clientSearch").value.toLowerCase();
+ $("clientTable").innerHTML=table(
+ ["Client ID","Client","Mobile","PAN","GSTIN","Actions"],
+ db.clients.filter(c=>[c.code,c.name,c.mobile,c.pan,c.gstin].join(" ").toLowerCase().includes(q))
+ .map(c=>[
+  esc(c.code),esc(c.name),esc(c.mobile),esc(c.pan),esc(c.gstin),
+  `<button class="secondary" onclick="selectClient('${c.id}')">Open</button>
+   <button onclick="editClient('${c.id}')">Edit</button>
+   <button class="danger" onclick="deleteClient('${c.id}')">Delete</button>`
+ ])
+ );
+}
+
+function renderLedgers(){
+ if(!client()){$("ledgerList").innerHTML='<div class="empty">Select client first.</div>';return;}
+ $("ledgerList").innerHTML=table(
+ ["Ledger","Group","Opening","Current Balance"],
+ client().ledgers.map(l=>{
+  let o=l.opening?.[yearId]||{amount:0,side:"Dr"},n=net(l);
+  return[esc(l.name),esc(l.group),money(o.amount)+" "+o.side,
+   money(Math.abs(n))+(n>=0?" Dr":" Cr")];
+ })
+ );
+}
+
+function renderDashboard(){
+ let v=year()?.vouchers||[],dr=0,cr=0;
+ v.forEach(x=>x.lines.forEach(l=>{dr+=l.dr;cr+=l.cr;}));
+ $("needClient").style.display=client()?"none":"block";
+ $("statClient").textContent=client()?.name||"—";
+ $("statYear").textContent=year()?.name||"—";
+ $("statV").textContent=v.length;
+ $("statL").textContent=client()?.ledgers.length||0;
+ $("statD").textContent=money(dr);$("statC").textContent=money(cr);
+ $("recent").innerHTML=table(
+ ["Date","Voucher","Type","Narration","Amount"],
+ [...v].reverse().slice(0,8).map(x=>[
+  x.date,esc(x.number),esc(x.type),esc(x.narration),
+  money(x.lines.reduce((s,e)=>s+e.dr,0))
+ ])
+ );
+}
+
+function renderDaybook(){
+ if(!client()){$("daybookTable").innerHTML="Select client first";return;}
+ const vouchers=(year()?.vouchers||[]).slice().sort((a,b)=>b.date.localeCompare(a.date));
+ $("daybookTable").innerHTML=table(
+  ["Date","Voucher No.","Type","Narration","Debit Total","Credit Total","Actions"],
+  vouchers.map(v=>{
+   const dr=(v.lines||[]).reduce((sum,e)=>sum+(Number(e.dr)||0),0);
+   const cr=(v.lines||[]).reduce((sum,e)=>sum+(Number(e.cr)||0),0);
+   return [
+    esc(v.date||""),esc(v.number||""),esc(v.type||""),esc(v.narration||""),
+    money(dr),money(cr),
+    `<button class="secondary" onclick="editVoucher('${v.id}')">Edit</button> <button class="danger" onclick="deleteVoucher('${v.id}')">Delete</button>`
+   ];
+  })
+ );
+}
+
+function renderLedgerReport(){
+ if(!client()){$("ledgerReportTable").innerHTML="Select client first";return;}
+ let el=$("reportLedger"),old=el.value;
+ el.innerHTML=options();
+ if(client().ledgers.some(l=>l.id===old))el.value=old;
+ if(!el.value)el.value=client().ledgers[0]?.id||"";
+ let l=client().ledgers.find(x=>x.id===el.value);
+ if(!l){$("ledgerReportTable").innerHTML="";return;}
+ let ob=l.opening?.[yearId]||{amount:0,side:"Dr"};
+ let n=(ob.side==="Cr"?-1:1)*Number(ob.amount||0);
+ let rows=[["—","Opening Balance",n>=0?money(n):"-",n<0?money(-n):"-",money(Math.abs(n))+(n>=0?" Dr":" Cr")]];
+ let tx=[];
+ (year()?.vouchers||[]).forEach(v=>v.lines.filter(e=>e.ledgerId===l.id).forEach(e=>tx.push({v,e})));
+ tx.sort((a,b)=>a.v.date.localeCompare(b.v.date));
+ tx.forEach(({v,e})=>{
+  n+=e.dr-e.cr;
+  rows.push([v.date,esc(v.number+" "+v.narration),e.dr?money(e.dr):"-",e.cr?money(e.cr):"-",money(Math.abs(n))+(n>=0?" Dr":" Cr")]);
+ });
+ $("ledgerReportTable").innerHTML=table(["Date","Particulars","Debit","Credit","Balance"],rows);
+}
+
+function renderTrial(){
+ if(!client()){$("trialTable").innerHTML="Select client first";return;}
+ let rows=client().ledgers.map(l=>{
+  let n=net(l);return[esc(l.name),n>0?money(n):"-",n<0?money(-n):"-"];
+ });
+ let d=client().ledgers.reduce((s,l)=>s+Math.max(0,net(l)),0);
+ let c=client().ledgers.reduce((s,l)=>s+Math.max(0,-net(l)),0);
+ rows.push(["TOTAL",money(d),money(c)]);
+ $("trialTable").innerHTML=table(["Account","Debit Balance","Credit Balance"],rows);
+}
+
+function renderPL(){
+ if(!client()){$("plTable").innerHTML="Select client first";return;}
+ let inc=client().ledgers.filter(l=>["Income","Direct Income"].includes(l.group));
+ let exp=client().ledgers.filter(l=>["Expense","Direct Expense"].includes(l.group));
+ let income=inc.reduce((s,l)=>s-net(l),0);
+ let expenses=exp.reduce((s,l)=>s+net(l),0);
+ $("plTable").innerHTML=table(["Particulars","Amount"],[
+  ...inc.map(l=>[esc(l.name),money(Math.max(0,-net(l)))]),
+  ["TOTAL INCOME",money(income)],
+  ...exp.map(l=>[esc(l.name),money(Math.max(0,net(l)))]),
+  ["TOTAL EXPENSES",money(expenses)],
+  ["NET PROFIT / (LOSS)",money(income-expenses)]
+ ]);
+}
+
+function renderBalance(){
+ if(!client()){$("balanceTable").innerHTML="Select client first";return;}
+ let rows=[];
+ ["Asset","Liability","Capital"].forEach(g=>{
+  rows.push(["<b>"+g.toUpperCase()+"</b>",""]);
+  client().ledgers.filter(l=>l.group===g).forEach(l=>{
+   let n=net(l);rows.push([esc(l.name),money(Math.abs(n))+(n>=0?" Dr":" Cr")]);
+  });
+ });
+ let inc=client().ledgers.filter(l=>["Income","Direct Income"].includes(l.group)).reduce((s,l)=>s-net(l),0);
+ let exp=client().ledgers.filter(l=>["Expense","Direct Expense"].includes(l.group)).reduce((s,l)=>s+net(l),0);
+ rows.push(["Current Period Profit / (Loss)",money(inc-exp)]);
+ $("balanceTable").innerHTML=table(["Particulars","Balance"],rows);
+}
+
+function renderAll(){
+ renderSelectors();renderClients();renderLedgers();renderDashboard();
+ renderDaybook();renderLedgerReport();renderTrial();renderPL();renderBalance();renderAccountEntrySummaries();
+}
+
+
+let calcExpr="0";
+function calcInput(x){
+ if(calcExpr==="Error")calcExpr="0";
+ if(calcExpr==="0"&&/[0-9.]/.test(x))calcExpr=x;
+ else calcExpr+=x;
+ $("display").textContent=calcExpr;
+}
+function clearCalc(){calcExpr="0";$("display").textContent=calcExpr;}
+function backCalc(){calcExpr=calcExpr.slice(0,-1)||"0";$("display").textContent=calcExpr;}
+function evaluateMath(s){
+ const tokens=s.match(/\d+(?:\.\d+)?|[()+\-*/%]/g);
+ if(!tokens||tokens.join("")!==s.replace(/\s/g,""))throw Error("Invalid expression");
+ let i=0;
+ function expression(){let v=term();while(tokens[i]==="+"||tokens[i]==="-"){const op=tokens[i++],b=term();v=op==="+"?v+b:v-b;}return v;}
+ function term(){let v=factor();while(tokens[i]==="*"||tokens[i]==="/"){const op=tokens[i++],b=factor();if(op==="/"&&b===0)throw Error("Division by zero");v=op==="*"?v*b:v/b;}return v;}
+ function factor(){if(tokens[i]==="+"){i++;return factor();}if(tokens[i]==="-"){i++;return-factor();}if(tokens[i]==="("){i++;const v=expression();if(tokens[i++]!==")")throw Error("Bracket mismatch");return v;}const t=tokens[i++];if(t===undefined||!/^\d+(?:\.\d+)?$/.test(t))throw Error("Number expected");let n=Number(t);if(tokens[i]==="%"){i++;n/=100;}return n;}
+ const result=expression();if(i!==tokens.length||!Number.isFinite(result))throw Error("Invalid result");return result;
+}
+function calcResult(){try{const n=evaluateMath(calcExpr);calcExpr=String(Math.round(n*1e8)/1e8);$("display").textContent=calcExpr;}catch(e){calcExpr="Error";$("display").textContent=calcExpr;}}
+
+function reportRows(){
+ let r=[["Date","Voucher No","Type","Narration","Ledger","Debit","Credit"]];
+ (year()?.vouchers||[]).forEach(v=>v.lines.forEach(e=>r.push([
+  v.date,v.number,v.type,v.narration,
+  client().ledgers.find(l=>l.id===e.ledgerId)?.name||"Unknown",e.dr,e.cr
+ ])));
+ return r;
+}
+
+function exportExcel(){
+ if(!client()||!year()){alert("Select client and year");return;}
+ if(!window.XLSX){alert("Excel library load nahi hui. Internet check karein.");return;}
+ let wb=XLSX.utils.book_new();
+ XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(reportRows()),"Transactions");
+ XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([
+  ["Ledger","Group","Opening","Current Balance"],
+  ...client().ledgers.map(l=>[l.name,l.group,l.opening?.[yearId]?.amount||0,net(l)])
+ ]),"Ledgers");
+ XLSX.writeFile(wb,`SAFS-${client().name}-${year().name}.xlsx`);
+}
+
+function exportPDF(){
+ exportPLPDF();
+}
+
+function exportPLPDF(){
+ if(!client()||!year()){alert("Select client and financial year first.");return;}
+ if(!window.jspdf||!window.jspdf.jsPDF){alert("PDF library could not load. Check your internet connection.");return;}
+ const {jsPDF}=window.jspdf;
+ const doc=new jsPDF({orientation:"portrait",unit:"mm",format:"a4"});
+ const pw=doc.internal.pageSize.getWidth(), ph=doc.internal.pageSize.getHeight();
+ const c=client(), y=year();
+ const company=(c.name||"BUSINESS NAME").toUpperCase();
+ const proprietor=(c.proprietor||"").trim();
+ const expenseLedgers=c.ledgers.filter(l=>["Expense","Direct Expense"].includes(l.group));
+ const incomeLedgers=c.ledgers.filter(l=>["Income","Direct Income"].includes(l.group));
+ const expenses=expenseLedgers.map(l=>({name:"To "+l.name,amount:Math.max(0,net(l))})).filter(x=>x.amount>0.0001);
+ const incomes=incomeLedgers.map(l=>({name:"By "+l.name,amount:Math.max(0,-net(l))})).filter(x=>x.amount>0.0001);
+ const totalExpense=expenses.reduce((s,x)=>s+x.amount,0);
+ const totalIncome=incomes.reduce((s,x)=>s+x.amount,0);
+ const profit=totalIncome-totalExpense;
+ if(!expenses.length&&!incomes.length){alert("No P&L entries found for this client and financial year.");return;}
+ const yearParts=y.name.split("-");
+ let reportDate="FOR FINANCIAL YEAR "+y.name.toUpperCase();
+ if(yearParts.length===2){let ey=yearParts[1].length===2?"20"+yearParts[1]:yearParts[1];reportDate="AS ON 31ST MARCH, "+ey;}
+ const fmt=n=>Number(n||0).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2});
+ const count=Math.max(expenses.length,incomes.length);
+ const body=[];
+ for(let i=0;i<count;i++){
+  const e=expenses[i],inc=incomes[i];
+  body.push([e?e.name:"",e?fmt(e.amount):"",inc?inc.name:"",inc?fmt(inc.amount):""]);
+ }
+ let profitIndex=-1;
+ if(profit>0.0001){profitIndex=body.length;body.push(["To Net Profit Transferred to Capital A/C",fmt(profit),"",""]);}
+ else if(profit< -0.0001){profitIndex=body.length;body.push(["","","By Net Loss Transferred to Capital A/C",fmt(Math.abs(profit))]);}
+ const grandTotal=Math.max(totalExpense,totalIncome);
+ const totalIndex=body.length;
+ body.push(["TOTAL",fmt(grandTotal),"TOTAL",fmt(grandTotal)]);
+ function header(){
+  doc.setTextColor(15,25,40);doc.setFont("helvetica","bold");doc.setFontSize(12);
+  doc.text(company,pw/2,15,{align:"center"});
+  let yy=21;
+  if(proprietor){doc.setFontSize(10);doc.text("PROP. "+proprietor.toUpperCase(),pw/2,yy,{align:"center"});yy+=6;}
+  doc.setFontSize(10.5);doc.text("PROFIT & LOSS ACCOUNT "+reportDate,pw/2,yy+1,{align:"center"});
+ }
+ doc.autoTable({
+  startY:proprietor?32:26,
+  head:[["EXPENDITURE","AMOUNT (RS)","INCOME","AMOUNT (RS)"]],
+  body,
+  theme:"grid",
+  margin:{top:36,left:10,right:10,bottom:17},
+  tableWidth:190,
+  styles:{font:"helvetica",fontSize:8.5,cellPadding:3,lineColor:[25,25,25],lineWidth:0.22,textColor:[20,20,20],minCellHeight:8,valign:"middle",overflow:"linebreak"},
+  headStyles:{fillColor:[238,242,247],textColor:[15,35,60],fontStyle:"bold",halign:"center",lineWidth:0.35},
+  columnStyles:{0:{cellWidth:68,halign:"left"},1:{cellWidth:27,halign:"right"},2:{cellWidth:68,halign:"left"},3:{cellWidth:27,halign:"right"}},
+  didParseCell:function(d){
+   if(d.section==="body"&&d.row.index===profitIndex){d.cell.styles.fillColor=[255,245,0];d.cell.styles.fontStyle="bold";}
+   if(d.section==="body"&&d.row.index===totalIndex){d.cell.styles.fillColor=[225,233,243];d.cell.styles.fontStyle="bold";d.cell.styles.lineWidth=0.4;}
+  },
+  didDrawPage:function(){
+   header();
+   doc.setFont("helvetica","normal");doc.setFontSize(7.5);doc.setTextColor(90,90,90);
+   doc.text("Prepared by SAFS ASSOCIATE",10,ph-8);
+   doc.text("Page "+doc.internal.getNumberOfPages(),pw-10,ph-8,{align:"right"});
+  }
+ });
+ const safe=company.replace(/[^a-z0-9]+/gi,"_");
+ doc.save("SAFS_PL_"+safe+"_"+y.name.replace(/[^a-z0-9-]/gi,"_") +".pdf");
+}
+
+function exportWord(){
+ if(!client()||!year()){alert("Select client and year");return;}
+ let rows=reportRows();
+ let content="<html><meta charset='utf-8'><body><h1>SAFS ASSOCIATE</h1><h3>"+
+ esc(client().name)+" | "+esc(year().name)+"</h3><table border='1' cellpadding='5'>"+
+ rows.map((r,i)=>"<tr>"+r.map(c=>`<${i?"td":"th"}>${esc(c)}</${i?"td":"th"}>`).join("")+"</tr>").join("")+
+ "</table></body></html>";
+ download(new Blob(["\ufeff",content],{type:"application/msword"}),"SAFS-Accounting.doc");
+}
+
+function download(blob,name){
+ let u=URL.createObjectURL(blob),a=document.createElement("a");
+ a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();
+ setTimeout(()=>URL.revokeObjectURL(u),1000);
+}
+function backup(){
+ download(new Blob([JSON.stringify(db,null,2)],{type:"application/json"}),"SAFS-ASSOCIATE-Backup.json");
+}
+function restoreBackup(ev){
+ let f=ev.target.files[0];if(!f)return;
+ let r=new FileReader();
+ r.onload=()=>{
+  try{
+   let x=JSON.parse(r.result);
+   if(!Array.isArray(x.clients))throw Error();
+   if(!confirm("All current client data will be replaced. Continue?"))return;
+   db=x;clientId="";yearId="";persist();renderAll();alert("Backup restored");
+  }catch(e){alert("Invalid SAFS backup file");}
+  finally{ev.target.value="";}
+ };
+ r.readAsText(f);
+}
+
+$("vDate").value=today();
+["plDate","capitalDate","balanceDate"].forEach(id=>$(id).value=today());
+["pl","capital","balance"].forEach(k=>{addAccountRow(k);addAccountRow(k);});
+ensureSelection();
+renderAll();
+clearVoucher();
+persist();
+</script>
+</body>
+</html>
