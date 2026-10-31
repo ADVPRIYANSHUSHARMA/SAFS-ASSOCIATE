@@ -339,7 +339,26 @@ footer{text-align:center;background:#101d35;color:#dce6f7;padding:14px;font-size
   </div>
  </div>
 </section>
-
+ <button class="nav" onclick="page('uploads',this)">📁 File Upload</button>
+ <section id="uploads" class="page">
+ <h2>Client Documents / File Upload</h2>
+ <div class="card">
+  <h3>Upload Documents</h3>
+  <label>Select Files</label>
+  <input id="documentFiles" type="file" multiple
+   accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png">
+  <div class="actions">
+   <button class="success" onclick="uploadDocuments()">Upload Files</button>
+  </div>
+  <p class="muted">Maximum 20 MB per file.</p>
+  <div id="uploadStatus"></div>
+ </div>
+ <div class="card">
+  <h3>Uploaded Documents</h3>
+  <div id="uploadedFilesList"></div>
+ </div>
+</section>
+ 
 <section id="backup" class="page">
  <h2>Export & Backup</h2>
  <div class="card">
